@@ -46,8 +46,9 @@
           id="outText" 
           ref="textAreaRef"
           readonly 
-          v-model="transcribedText"
+          :value="transcribedText"
           placeholder="Здесь появится текст, когда вы начнете..."
+          @input="handleTextareaScroll"
         ></textarea>
         
         <button class="btn-download" @click="downloadText" :disabled="!transcribedText">
@@ -59,7 +60,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick } from 'vue';
 
 // --- Конфигурация ---
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
@@ -69,7 +70,7 @@ const isStreaming = ref(false);
 const transcribedText = ref('');
 const videoEl = ref(null);
 const canvasEl = ref(null);
-const textAreaRef = ref(null); // Ref для textarea
+const textAreaRef = ref(null);
 
 let ws = null;
 let intervalId = null;
@@ -85,15 +86,20 @@ const getWsUrl = () => {
   return `${url}/socket`;
 };
 
-// --- Автоскролл при изменении текста ---
-watch(transcribedText, () => {
-  // Используем nextTick чтобы убедиться, что DOM обновился
-  setTimeout(() => {
-    if (textAreaRef.value) {
+// --- Функция для скролла textarea ---
+const scrollToBottom = () => {
+  if (textAreaRef.value) {
+    // Используем requestAnimationFrame для гарантии, что DOM обновлен
+    requestAnimationFrame(() => {
       textAreaRef.value.scrollTop = textAreaRef.value.scrollHeight;
-    }
-  }, 0);
-});
+    });
+  }
+};
+
+// --- Обработчик для textarea (на всякий случай) ---
+const handleTextareaScroll = () => {
+  // Ничего не делаем, просто обрабатываем событие
+};
 
 // --- Lifecycle ---
 onMounted(async () => {
@@ -144,7 +150,20 @@ function startStream() {
     try {
       const data = JSON.parse(e.data);
       if(data.text) {
+        // Сохраняем текущий скролл позицию
+        const wasScrolledToBottom = textAreaRef.value 
+          ? Math.abs(textAreaRef.value.scrollHeight - textAreaRef.value.scrollTop - textAreaRef.value.clientHeight) < 10
+          : false;
+        
+        // Обновляем текст
         transcribedText.value += data.text + " ";
+        
+        // Прокручиваем вниз только если пользователь уже был внизу
+        nextTick(() => {
+          if (wasScrolledToBottom) {
+            scrollToBottom();
+          }
+        });
       }
     } catch(err) {
       console.error(err);
@@ -302,7 +321,10 @@ textarea {
   box-sizing: border-box;
   font-family: inherit;
   resize: vertical;
-  overflow-y: auto; /* Обеспечиваем вертикальную прокрутку */
+  overflow-y: auto;
+  overflow-x: hidden;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 .btn-download {
