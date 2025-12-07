@@ -7,8 +7,8 @@
       <div class="orb orb-3"></div>
     </div>
 
-    <!-- Шапка -->
-    <header>
+    <!-- Десктопный хедер -->
+    <header class="desktop-header">
       <div class="logo">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5Z"/>
@@ -22,6 +22,49 @@
         <router-link to="/simple/" class="nav-link">Для пенсионеров</router-link>
       </nav>
     </header>
+
+    <!-- Мобильный хедер -->
+    <div class="mobile-header">
+      <button class="menu-toggle" @click="toggleMobileMenu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+      <div class="mobile-logo">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5Z"/>
+          <path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/>
+        </svg>
+        SIGMA<span>SIGN</span>
+      </div>
+    </div>
+
+    <!-- Мобильное меню -->
+    <div class="mobile-menu" :class="{ active: isMobileMenuOpen }">
+      <div class="mobile-menu-header">
+        <div class="mobile-menu-logo">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5Z"/>
+            <path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/>
+          </svg>
+          SIGMA<span>SIGN</span>
+        </div>
+        <button class="menu-close" @click="toggleMobileMenu">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <nav class="mobile-nav">
+        <button @click="setMode('camera'); toggleMobileMenu();" :class="{ active: mode === 'camera' }">В реальном времени</button>
+        <button @click="setMode('upload'); toggleMobileMenu();" :class="{ active: mode === 'upload' }">Из файла</button>
+        <router-link to="/simple/" class="mobile-nav-link" @click="toggleMobileMenu">Для пенсионеров</router-link>
+      </nav>
+    </div>
+    <div class="mobile-menu-overlay" :class="{ active: isMobileMenuOpen }" @click="toggleMobileMenu"></div>
 
     <main class="content-wrapper">
       
@@ -186,14 +229,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 
-// --- Конфигурация ---
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 const FPS = 24;
 
-// --- State ---
-const mode = ref('camera'); // 'camera' | 'upload'
+const mode = ref('camera');
 const isStreaming = ref(false);
 const statusText = ref('Ready');
 const transcribedText = ref('');
@@ -207,18 +248,16 @@ const isUploading = ref(false);
 const isPolling = ref(false);
 const isDragOver = ref(false);
 const processingProgress = ref(0);
+const isMobileMenuOpen = ref(false);
 
-// --- Refs ---
 const videoEl = ref(null);
 const canvasEl = ref(null);
 const fileInput = ref(null);
 
-// --- WebSocket Vars ---
 let ws = null;
 let intervalId = null;
 let pollInterval = null;
 
-// --- Helper: URL Builder ---
 const getWsUrl = () => {
   let url = API_BASE.replace(/\/$/, '');
   if (url.startsWith('https')) {
@@ -229,12 +268,10 @@ const getWsUrl = () => {
   return `${url}/socket`;
 };
 
-// --- Helper: API URL ---
 const getApiUrl = (endpoint) => {
   return `${API_BASE.replace(/\/$/, '')}${endpoint}`;
 };
 
-// --- Lifecycle ---
 onMounted(async () => {
   if (mode.value === 'camera') {
     await initCamera();
@@ -246,7 +283,6 @@ onUnmounted(() => {
   stopPolling();
 });
 
-// --- Camera Logic (остается без изменений) ---
 async function initCamera() {
   if (mode.value !== 'camera') return;
   try {
@@ -281,6 +317,10 @@ function setMode(newMode) {
       videoEl.value.srcObject = null;
     }
   }
+}
+
+function toggleMobileMenu() {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value;
 }
 
 function toggleStream() {
@@ -355,7 +395,6 @@ function sendFrame() {
   }, 'image/jpeg', 0.5);
 }
 
-// --- Upload Logic ---
 function triggerFileUpload() {
   if (fileInput.value) fileInput.value.click();
 }
@@ -439,10 +478,8 @@ async function startPolling() {
   if (pollInterval) clearInterval(pollInterval);
   isPolling.value = true;
   
-  // Первый опрос сразу
   await pollJobStatus();
   
-  // Затем каждые 2 секунды
   pollInterval = setInterval(async () => {
     await pollJobStatus();
   }, 2000);
@@ -468,15 +505,12 @@ async function pollJobStatus() {
     jobStatus.value = data.status;
     jobError.value = data.error || null;
     
-    // Обновляем прогресс
     if (data.total_batches && data.processed_batches) {
       processingProgress.value = Math.round((data.processed_batches / data.total_batches) * 100);
     }
     
-    // Если обработка завершена
     if (data.status === 'completed') {
       stopPolling();
-      // Автоматически загружаем текст
       loadTranscription();
     } else if (data.status === 'failed') {
       stopPolling();
@@ -547,7 +581,6 @@ function getStatusText(status) {
   return statusMap[status] || status;
 }
 
-// --- Export ---
 function downloadText() {
   if (!transcribedText.value) return;
   const blob = new Blob([transcribedText.value], { type: 'text/plain' });
@@ -560,10 +593,8 @@ function downloadText() {
 </script>
 
 <style scoped>
-/* --- Шрифты --- */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap');
 
-/* --- Общие --- */
 .app-container {
   font-family: 'Inter', sans-serif;
   background: #0f0f13;
@@ -577,7 +608,6 @@ function downloadText() {
   overflow: hidden;
 }
 
-/* --- Фон --- */
 .ambient-bg {
   position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
   background: radial-gradient(circle at 50% 50%, #1a1a2e, #000);
@@ -588,12 +618,15 @@ function downloadText() {
 .orb-2 { width: 400px; height: 400px; background: #00f2ff; bottom: -20%; right: -10%; opacity: 0.3; }
 .orb-3 { width: 300px; height: 300px; background: #00ff88; top: 40%; left: 40%; opacity: 0.2; }
 
-/* --- Header --- */
-header {
+.desktop-header {
   display: flex; justify-content: space-between; align-items: center;
   padding: 0 24px; height: 60px; z-index: 10;
   background: rgba(255,255,255,0.05); backdrop-filter: blur(10px);
   border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
+}
+
+.mobile-header {
+  display: none;
 }
 
 .logo { 
@@ -612,12 +645,10 @@ nav button.active, .nav-link:hover {
   text-shadow: 0 0 10px rgba(255,255,255,0.5);
 }
 
-/* --- Layout --- */
 .content-wrapper {
   display: flex; gap: 20px; flex: 1; z-index: 10; height: calc(100% - 80px);
 }
 
-/* --- Video Section --- */
 .video-viewport {
   flex: 3; position: relative; background: #000; border-radius: 20px;
   overflow: hidden; border: 1px solid rgba(255,255,255,0.1);
@@ -632,7 +663,6 @@ nav button.active, .nav-link:hover {
 }
 video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
 
-/* UI Elements inside Video */
 .video-ui-top {
   position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.6);
   padding: 8px 16px; border-radius: 30px; display: flex; align-items: center; gap: 10px; z-index: 5;
@@ -665,7 +695,6 @@ video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
 }
 .hand-tracking-box.active { border-color: #00f2ff; box-shadow: 0 0 20px rgba(0,242,255,0.2), inset 0 0 20px rgba(0,242,255,0.1); }
 
-/* --- Upload Mode --- */
 .upload-viewport { 
   background: rgba(0,0,0,0.3); 
   display: flex; 
@@ -906,7 +935,6 @@ video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
   color: #00ff88;
 }
 
-/* --- Transcription Section --- */
 .transcription-panel {
   flex: 1; 
   background: rgba(255,255,255,0.03); 
@@ -1013,12 +1041,176 @@ video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
   cursor: not-allowed;
 }
 
-/* --- Mobile --- */
 @media (max-width: 900px) {
-  .content-wrapper { flex-direction: column; }
-  .video-viewport { flex: none; height: 350px; }
-  .upload-zone { padding: 30px; }
-  .file-info { flex-direction: column; text-align: center; }
-  .btn-group { flex-direction: column; }
+  .desktop-header {
+    display: none;
+  }
+  
+  .mobile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    height: 60px;
+    z-index: 20;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+  }
+  
+  .menu-toggle {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .mobile-logo {
+    font-family: 'JetBrains Mono';
+    font-weight: 700;
+    font-size: 1rem;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  
+  .mobile-logo span {
+    color: #00f2ff;
+    text-shadow: 0 0 10px rgba(0,242,255,0.5);
+  }
+  
+  .mobile-menu {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 280px;
+    height: 100%;
+    background: #0f0f13;
+    z-index: 1000;
+    transition: left 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+  }
+  
+  .mobile-menu.active {
+    left: 0;
+  }
+  
+  .mobile-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s;
+  }
+  
+  .mobile-menu-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .mobile-menu-header {
+    padding: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .mobile-menu-logo {
+    font-family: 'JetBrains Mono';
+    font-weight: 700;
+    font-size: 1.2rem;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  
+  .mobile-menu-logo span {
+    color: #00f2ff;
+    text-shadow: 0 0 10px rgba(0,242,255,0.5);
+  }
+  
+  .menu-close {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .mobile-nav {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 12px;
+  }
+  
+  .mobile-nav button,
+  .mobile-nav-link {
+    background: none;
+    border: none;
+    color: #a0a0a0;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+    padding: 12px 16px;
+    border-radius: 8px;
+    transition: all 0.3s;
+    font-family: 'Inter', sans-serif;
+    text-align: left;
+  }
+  
+  .mobile-nav button.active,
+  .mobile-nav-link:hover {
+    color: white;
+    background: rgba(255,255,255,0.1);
+    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+  }
+  
+  .content-wrapper {
+    flex-direction: column;
+    height: calc(100% - 80px);
+  }
+  
+  .video-viewport {
+    flex: none;
+    height: 350px;
+    padding: 15px;
+  }
+  
+  .upload-zone {
+    padding: 30px;
+  }
+  
+  .file-info {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .btn-group {
+    flex-direction: column;
+  }
+  
+  .hand-tracking-box {
+    width: 200px;
+    height: 200px;
+  }
 }
 </style>
