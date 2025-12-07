@@ -2,7 +2,7 @@
   <div class="simple-body">
     <!-- Шапка -->
     <header class="simple-header">
-      <h1>SigmaSign - Плесень edition</h1>
+      <h1>SigmaSign - упрощенный</h1>
       <router-link to="/" class="back-link">
         ← Вернуться к обычной версии
       </router-link>
