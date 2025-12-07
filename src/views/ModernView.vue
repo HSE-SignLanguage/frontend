@@ -1090,7 +1090,7 @@ video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
     border: 1px solid rgba(255,255,255,0.1);
   }
 
-  /* Сайдбар для мобильных */
+  /* Сайдбар для мобильных - ИЗМЕНЕНИЯ: */
   .mobile-sidebar {
     position: fixed;
     top: 0;
@@ -1099,11 +1099,14 @@ video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
     height: 100%;
     z-index: 1000;
     display: block;
-    pointer-events: none;
+    opacity: 0; /* Скрыт по умолчанию */
+    visibility: hidden; /* Скрыт по умолчанию */
+    transition: opacity 0.3s ease, visibility 0.3s ease;
   }
 
   .mobile-sidebar.open {
-    pointer-events: all;
+    opacity: 1; /* Показываем */
+    visibility: visible; /* Показываем */
   }
 
   .sidebar-overlay {
@@ -1125,21 +1128,23 @@ video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
   .sidebar-content {
     position: absolute;
     top: 0;
-    left: -280px;
+    left: -100%; /* Полностью скрыт за экраном */
     width: 280px;
     height: 100%;
     background: #0f0f13;
     border-right: 1px solid rgba(255,255,255,0.1);
     display: flex;
     flex-direction: column;
-    transition: left 0.3s ease;
+    transition: left 0.3s ease 0.1s; /* Задержка чтобы начать анимацию после появления */
     padding: 20px;
   }
 
   .mobile-sidebar.open .sidebar-content {
-    left: 0;
+    left: 0; /* Показываем */
+    transition: left 0.3s ease 0s; /* Без задержки при показе */
   }
 
+  /* Остальные стили остаются без изменений */
   .sidebar-logo {
     font-family: 'JetBrains Mono', monospace;
     font-weight: 700;
