@@ -44,6 +44,7 @@
         <label for="outText">Распознанный текст:</label>
         <textarea 
           id="outText" 
+          ref="textAreaRef"
           readonly 
           v-model="transcribedText"
           placeholder="Здесь появится текст, когда вы начнете..."
@@ -58,7 +59,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 
 // --- Конфигурация ---
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
@@ -68,6 +69,7 @@ const isStreaming = ref(false);
 const transcribedText = ref('');
 const videoEl = ref(null);
 const canvasEl = ref(null);
+const textAreaRef = ref(null); // Ref для textarea
 
 let ws = null;
 let intervalId = null;
@@ -82,6 +84,16 @@ const getWsUrl = () => {
   }
   return `${url}/socket`;
 };
+
+// --- Автоскролл при изменении текста ---
+watch(transcribedText, () => {
+  // Используем nextTick чтобы убедиться, что DOM обновился
+  setTimeout(() => {
+    if (textAreaRef.value) {
+      textAreaRef.value.scrollTop = textAreaRef.value.scrollHeight;
+    }
+  }, 0);
+});
 
 // --- Lifecycle ---
 onMounted(async () => {
@@ -133,9 +145,6 @@ function startStream() {
       const data = JSON.parse(e.data);
       if(data.text) {
         transcribedText.value += data.text + " ";
-        // Автоскролл
-        const ta = document.getElementById('outText');
-        if(ta) ta.scrollTop = ta.scrollHeight;
       }
     } catch(err) {
       console.error(err);
@@ -293,6 +302,7 @@ textarea {
   box-sizing: border-box;
   font-family: inherit;
   resize: vertical;
+  overflow-y: auto; /* Обеспечиваем вертикальную прокрутку */
 }
 
 .btn-download {
