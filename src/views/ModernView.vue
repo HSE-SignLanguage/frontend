@@ -7,8 +7,8 @@
       <div class="orb orb-3"></div>
     </div>
 
-    <!-- Шапка -->
-    <header>
+    <!-- Десктопный хедер (только для ПК) -->
+    <header class="desktop-header">
       <div class="logo">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5Z"/>
@@ -22,6 +22,36 @@
         <router-link to="/simple/" class="nav-link">Для пенсионеров</router-link>
       </nav>
     </header>
+
+    <!-- Мобильный хедер (только для мобильных) -->
+    <header class="mobile-header">
+      <button class="menu-toggle" @click="toggleSidebar">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Сайдбар для мобильных -->
+    <div class="mobile-sidebar" :class="{ open: sidebarOpen }">
+      <div class="sidebar-overlay" @click="toggleSidebar"></div>
+      <div class="sidebar-content">
+        <div class="sidebar-logo">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5Z"/>
+            <path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/>
+          </svg>
+          SIGMA<span>SIGN</span>
+        </div>
+        <nav class="sidebar-nav">
+          <button @click="setMode('camera'); toggleSidebar();" :class="{ active: mode === 'camera' }">В реальном времени</button>
+          <button @click="setMode('upload'); toggleSidebar();" :class="{ active: mode === 'upload' }">Из файла</button>
+          <router-link to="/simple/" class="nav-link" @click="toggleSidebar">Для пенсионеров</router-link>
+        </nav>
+      </div>
+    </div>
 
     <main class="content-wrapper">
       
@@ -186,7 +216,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 
 // --- Конфигурация ---
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
@@ -207,6 +237,7 @@ const isUploading = ref(false);
 const isPolling = ref(false);
 const isDragOver = ref(false);
 const processingProgress = ref(0);
+const sidebarOpen = ref(false);
 
 // --- Refs ---
 const videoEl = ref(null);
@@ -246,7 +277,7 @@ onUnmounted(() => {
   stopPolling();
 });
 
-// --- Camera Logic (остается без изменений) ---
+// --- Camera Logic ---
 async function initCamera() {
   if (mode.value !== 'camera') return;
   try {
@@ -547,6 +578,11 @@ function getStatusText(status) {
   return statusMap[status] || status;
 }
 
+// --- Sidebar ---
+function toggleSidebar() {
+  sidebarOpen.value = !sidebarOpen.value;
+}
+
 // --- Export ---
 function downloadText() {
   if (!transcribedText.value) return;
@@ -588,8 +624,8 @@ function downloadText() {
 .orb-2 { width: 400px; height: 400px; background: #00f2ff; bottom: -20%; right: -10%; opacity: 0.3; }
 .orb-3 { width: 300px; height: 300px; background: #00ff88; top: 40%; left: 40%; opacity: 0.2; }
 
-/* --- Header --- */
-header {
+/* --- Десктопный хедер (только для ПК) --- */
+.desktop-header {
   display: flex; justify-content: space-between; align-items: center;
   padding: 0 24px; height: 60px; z-index: 10;
   background: rgba(255,255,255,0.05); backdrop-filter: blur(10px);
@@ -602,14 +638,24 @@ header {
 }
 .logo span { color: #00f2ff; text-shadow: 0 0 10px rgba(0,242,255,0.5); }
 
-nav button, .nav-link {
+.desktop-header nav button, .nav-link {
   background: none; border: none; color: #a0a0a0; font-size: 0.9rem; margin-left: 15px;
   cursor: pointer; text-decoration: none; padding: 6px 12px; border-radius: 6px;
   transition: all 0.3s; font-family: 'Inter', sans-serif;
 }
-nav button.active, .nav-link:hover {
+.desktop-header nav button.active, .nav-link:hover {
   color: white; background: rgba(255,255,255,0.1);
   text-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+
+/* --- Мобильный хедер (скрыт на ПК) --- */
+.mobile-header {
+  display: none;
+}
+
+/* --- Сайдбар для мобильных (скрыт на ПК) --- */
+.mobile-sidebar {
+  display: none;
 }
 
 /* --- Layout --- */
@@ -1013,12 +1059,156 @@ video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
   cursor: not-allowed;
 }
 
-/* --- Mobile --- */
+/* ==================== МОБИЛЬНАЯ ВЕРСИЯ ==================== */
 @media (max-width: 900px) {
-  .content-wrapper { flex-direction: column; }
-  .video-viewport { flex: none; height: 350px; }
-  .upload-zone { padding: 30px; }
-  .file-info { flex-direction: column; text-align: center; }
-  .btn-group { flex-direction: column; }
+  /* Скрываем десктопный хедер на мобильных */
+  .desktop-header {
+    display: none;
+  }
+
+  /* Показываем мобильный хедер */
+  .mobile-header {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    height: 60px;
+    z-index: 100;
+  }
+
+  .menu-toggle {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  /* Сайдбар для мобильных */
+  .mobile-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: block;
+    pointer-events: none;
+  }
+
+  .mobile-sidebar.open {
+    pointer-events: all;
+  }
+
+  .sidebar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .mobile-sidebar.open .sidebar-overlay {
+    opacity: 1;
+  }
+
+  .sidebar-content {
+    position: absolute;
+    top: 0;
+    left: -280px;
+    width: 280px;
+    height: 100%;
+    background: #0f0f13;
+    border-right: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    flex-direction: column;
+    transition: left 0.3s ease;
+    padding: 20px;
+  }
+
+  .mobile-sidebar.open .sidebar-content {
+    left: 0;
+  }
+
+  .sidebar-logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 1.3rem;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 20px 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .sidebar-logo span {
+    color: #00f2ff;
+    text-shadow: 0 0 10px rgba(0,242,255,0.5);
+  }
+
+  .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .sidebar-nav button,
+  .sidebar-nav .nav-link {
+    background: none;
+    border: none;
+    color: #a0a0a0;
+    font-size: 1rem;
+    cursor: pointer;
+    text-align: left;
+    padding: 12px 16px;
+    border-radius: 8px;
+    transition: all 0.3s;
+    text-decoration: none;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .sidebar-nav button.active,
+  .sidebar-nav .nav-link:hover,
+  .sidebar-nav button:hover {
+    color: white;
+    background: rgba(255,255,255,0.1);
+    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+  }
+
+  /* Остальные мобильные стили (оригинальные) */
+  .content-wrapper {
+    flex-direction: column;
+    height: calc(100% - 60px);
+  }
+
+  .video-viewport {
+    flex: none;
+    height: 350px;
+    padding: 20px;
+  }
+
+  .upload-zone {
+    padding: 30px;
+  }
+
+  .file-info {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .btn-group {
+    flex-direction: column;
+  }
 }
 </style>
