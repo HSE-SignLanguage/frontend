@@ -7,8 +7,8 @@ RUN npm install
 COPY . .
 
 # Pass API base URL into Vite build
-ARG VITE_API_BASE_URL=https://hack.eferzo.xyz/api
-ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+ARG VITE_API_BASE_URL=${VITE_API_BASE_URL}
+ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 
 RUN npm run build
 
