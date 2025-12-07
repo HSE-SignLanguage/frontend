@@ -61,7 +61,7 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 
 // --- Конфигурация ---
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://hack.eferzo.xyz/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 const FPS = 24;
 
 const isStreaming = ref(false);
