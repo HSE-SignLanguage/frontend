@@ -43,7 +43,8 @@
       <div class="text-section">
         <label for="outText">Распознанный текст:</label>
         <textarea 
-          id="outText" 
+          id="outText"
+          ref="textareaRef" 
           readonly 
           v-model="transcribedText"
           placeholder="Здесь появится текст, когда вы начнете..."
@@ -58,7 +59,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick } from 'vue';
 
 // --- Конфигурация ---
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
@@ -68,6 +69,7 @@ const isStreaming = ref(false);
 const transcribedText = ref('');
 const videoEl = ref(null);
 const canvasEl = ref(null);
+const textareaRef = ref(null); // Ссылка на textarea для скролла
 
 let ws = null;
 let intervalId = null;
@@ -133,9 +135,13 @@ function startStream() {
       const data = JSON.parse(e.data);
       if(data.text) {
         transcribedText.value += data.text + " ";
-        // Автоскролл
-        const ta = document.getElementById('outText');
-        if(ta) ta.scrollTop = ta.scrollHeight;
+        
+        // ИСПРАВЛЕНИЕ: Используем nextTick для автоскролла
+        nextTick(() => {
+          if (textareaRef.value) {
+            textareaRef.value.scrollTop = textareaRef.value.scrollHeight;
+          }
+        });
       }
     } catch(err) {
       console.error(err);
