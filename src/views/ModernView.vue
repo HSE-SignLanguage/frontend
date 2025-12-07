@@ -14,12 +14,12 @@
           <path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5Z"/>
           <path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/>
         </svg>
-        Sigma<span>Sign</span>
+        SIGMA<span>SIGN</span>
       </div>
       <nav>
-        <button @click="setMode('camera')" :class="{ active: mode === 'camera' }">Live Camera</button>
-        <button @click="setMode('upload')" :class="{ active: mode === 'upload' }">Upload File</button>
-        <router-link to="/simple/" class="nav-link">Simple Mode</router-link>
+        <button @click="setMode('camera')" :class="{ active: mode === 'camera' }">В реальном времени</button>
+        <button @click="setMode('upload')" :class="{ active: mode === 'upload' }">Из файла</button>
+        <router-link to="/simple/" class="nav-link">Для пенсионеров</router-link>
       </nav>
     </header>
 
@@ -46,8 +46,8 @@
         <!-- Кнопки управления -->
         <div class="video-controls">
           <button class="stream-btn" :class="{ 'is-recording': isStreaming }" @click="toggleStream">
-            <span v-if="!isStreaming">▶ Start Stream</span>
-            <span v-else>■ Stop Stream</span>
+            <span v-if="!isStreaming">▶ Старт</span>
+            <span v-else>■ Стоп</span>
           </button>
         </div>
       </div>
@@ -83,7 +83,7 @@
               <line x1="12" y1="20" x2="12" y2="4"></line>
               <line x1="6" y1="20" x2="6" y2="14"></line>
             </svg>
-            Live Transcription
+            Расшифровка
           </div>
           <button class="export-btn" @click="downloadText">Save TXT</button>
         </div>
