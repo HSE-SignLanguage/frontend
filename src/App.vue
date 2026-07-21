@@ -13,7 +13,7 @@
 
 html {
   min-width: 320px;
-  background: #0f0f13;
+  background: #0e0c16;
 }
 
 body {
@@ -27,5 +27,10 @@ button,
 input,
 textarea {
   font: inherit;
+}
+
+::selection {
+  background: #8d5cff;
+  color: #fbf9ff;
 }
 </style>
