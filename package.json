@@ -4,6 +4,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "format": "prettier --write \"src/**/*.{js,vue}\" vite.config.js index.html",
+    "format:check": "prettier --check \"src/**/*.{js,vue}\" vite.config.js index.html",
+    "lint": "oxlint --deny-warnings src vite.config.js",
     "preview": "vite preview",
     "test": "vitest run"
   },
@@ -13,7 +16,14 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.8",
+    "oxlint": "1.74.0",
+    "prettier": "3.9.5",
     "vite": "^8.1.5",
     "vitest": "^4.1.10"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "semi": false,
+    "singleQuote": true
   }
 }
