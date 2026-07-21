@@ -1,3 +1,5 @@
+import { diagnostics } from '../diagnostics/logger'
+
 const FALLBACK_API_BASE = '/api/'
 
 function getOrigin() {
@@ -18,8 +20,8 @@ function getApiBaseUrl() {
     url.search = ''
     url.hash = ''
     return url
-  } catch (error) {
-    console.warn('Invalid VITE_API_BASE_URL, using same-origin /api:', error)
+  } catch {
+    diagnostics.warn('invalid-api-base')
     return new URL(FALLBACK_API_BASE, getOrigin())
   }
 }
