@@ -4,16 +4,37 @@
 
     <header class="desktop-header">
       <router-link to="/" class="logo" aria-label="Sigma Sign, главная">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5Z"/>
-          <path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/>
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="white"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5Z" />
+          <path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1" />
         </svg>
         <span class="logo-wordmark">Sigma <strong>Sign</strong></span>
       </router-link>
       <nav aria-label="Режим перевода">
         <div class="mode-switch" role="group" aria-label="Источник видео">
-          <button @click="setMode('camera')" :class="{ active: mode === 'camera' }" :aria-pressed="mode === 'camera'">Камера</button>
-          <button @click="setMode('upload')" :class="{ active: mode === 'upload' }" :aria-pressed="mode === 'upload'">Видеофайл</button>
+          <button
+            @click="setMode('camera')"
+            :class="{ active: mode === 'camera' }"
+            :aria-pressed="mode === 'camera'"
+          >
+            Камера
+          </button>
+          <button
+            @click="setMode('upload')"
+            :class="{ active: mode === 'upload' }"
+            :aria-pressed="mode === 'upload'"
+          >
+            Видеофайл
+          </button>
         </div>
         <router-link to="/simple/" class="nav-link">Упрощённый режим</router-link>
       </nav>
@@ -21,14 +42,37 @@
 
     <header class="mobile-header">
       <router-link to="/" class="logo compact-logo" aria-label="Sigma Sign, главная">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5Z"/>
-          <path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/>
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="white"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5Z" />
+          <path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1" />
         </svg>
         <span class="logo-wordmark">Sigma <strong>Sign</strong></span>
       </router-link>
-      <button class="menu-toggle" @click="toggleSidebar" aria-label="Открыть меню" :aria-expanded="sidebarOpen">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <button
+        class="menu-toggle"
+        @click="toggleSidebar"
+        aria-label="Открыть меню"
+        :aria-expanded="sidebarOpen"
+      >
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="white"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
           <line x1="3" y1="12" x2="21" y2="12"></line>
           <line x1="3" y1="6" x2="21" y2="6"></line>
           <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -44,16 +88,22 @@
           <button class="sidebar-close" @click="toggleSidebar" aria-label="Закрыть меню">×</button>
         </div>
         <nav class="sidebar-nav">
-          <button @click="setMode('camera'); toggleSidebar();" :class="{ active: mode === 'camera' }">Камера</button>
-          <button @click="setMode('upload'); toggleSidebar();" :class="{ active: mode === 'upload' }">Видеофайл</button>
-          <router-link to="/simple/" class="nav-link" @click="toggleSidebar">Упрощённый режим</router-link>
+          <button @click="selectMobileMode('camera')" :class="{ active: mode === 'camera' }">
+            Камера
+          </button>
+          <button @click="selectMobileMode('upload')" :class="{ active: mode === 'upload' }">
+            Видеофайл
+          </button>
+          <router-link to="/simple/" class="nav-link" @click="toggleSidebar"
+            >Упрощённый режим</router-link
+          >
         </nav>
       </aside>
     </div>
 
     <main id="main-content" class="content-wrapper">
       <h1 class="visually-hidden">Sigma Sign — перевод русской жестовой речи</h1>
-      
+
       <!-- РЕЖИМ КАМЕРЫ -->
       <div v-show="mode === 'camera'" class="video-viewport">
         <div class="video-ui-top" role="status" aria-live="polite" aria-atomic="true">
@@ -66,15 +116,20 @@
 
         <!-- Рамка трекинга (декоративная) -->
         <div class="hand-tracking-box" :class="{ active: isStreaming }"></div>
-        
+
         <!-- Видео элемент -->
         <video ref="videoEl" autoplay playsinline muted></video>
         <!-- Скрытый холст для сжатия кадров -->
-        <canvas ref="canvasEl" width="854" height="480" style="display:none;"></canvas>
+        <canvas ref="canvasEl" width="854" height="480" style="display: none"></canvas>
 
         <!-- Кнопки управления -->
         <div class="video-controls">
-          <button class="stream-btn" :class="{ 'is-recording': isStreaming }" @click="toggleStream" :aria-pressed="isStreaming">
+          <button
+            class="stream-btn"
+            :class="{ 'is-recording': isStreaming }"
+            @click="toggleStream"
+            :aria-pressed="isStreaming"
+          >
             <span v-if="isConnecting">Отменить подключение</span>
             <span v-else-if="!isStreaming">▶ Начать перевод</span>
             <span v-else>■ Остановить перевод</span>
@@ -84,17 +139,36 @@
 
       <!-- РЕЖИМ ЗАГРУЗКИ -->
       <div v-show="mode === 'upload'" class="video-viewport upload-viewport">
-        <div v-if="!uploadedFile && !jobId" class="upload-zone" role="button" tabindex="0"
-             aria-label="Выбрать видео для обработки"
-             @click="triggerFileUpload"
-             @keydown.enter.prevent="triggerFileUpload"
-             @keydown.space.prevent="triggerFileUpload"
-             :class="{ 'is-dragover': isDragOver }"
-             @dragover.prevent="handleDragOver"
-             @dragleave.prevent="handleDragLeave"
-             @drop.prevent="handleDrop">
-          <input type="file" ref="fileInput" accept="video/*" @click.stop @change="handleFileSelect" style="display:none">
-          <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#a0a0a0" stroke-width="1">
+        <div
+          v-if="!uploadedFile && !jobId"
+          class="upload-zone"
+          role="button"
+          tabindex="0"
+          aria-label="Выбрать видео для обработки"
+          @click="triggerFileUpload"
+          @keydown.enter.prevent="triggerFileUpload"
+          @keydown.space.prevent="triggerFileUpload"
+          :class="{ 'is-dragover': isDragOver }"
+          @dragover.prevent="handleDragOver"
+          @dragleave.prevent="handleDragLeave"
+          @drop.prevent="handleDrop"
+        >
+          <input
+            type="file"
+            ref="fileInput"
+            accept="video/*"
+            @click.stop
+            @change="handleFileSelect"
+            style="display: none"
+          />
+          <svg
+            width="50"
+            height="50"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#a0a0a0"
+            stroke-width="1"
+          >
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
             <polyline points="17 8 12 3 7 8"></polyline>
             <line x1="12" y1="3" x2="12" y2="15"></line>
@@ -103,10 +177,17 @@
           <div class="upload-subtext">Нажмите или перетащите файл сюда</div>
           <div class="upload-formats">MP4 · WEBM · AVI · MOV · до 100 МиБ</div>
         </div>
-        
+
         <div v-else-if="uploadedFile && !jobId" class="file-preview">
           <div class="file-info">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#00ff88" stroke-width="1.5">
+            <svg
+              width="40"
+              height="40"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#00ff88"
+              stroke-width="1.5"
+            >
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
               <polyline points="14 2 14 8 20 8"></polyline>
               <line x1="16" y1="13" x2="8" y2="13"></line>
@@ -118,14 +199,14 @@
               <p class="file-size">{{ formatFileSize(uploadedFile.size) }}</p>
             </div>
           </div>
-          
+
           <div class="upload-progress" v-if="uploadProgress > 0">
             <div class="progress-bar">
               <div class="progress-fill" :style="{ width: uploadProgress + '%' }"></div>
             </div>
             <div class="progress-text">{{ uploadProgress }}%</div>
           </div>
-          
+
           <div class="btn-group">
             <button class="stream-btn" @click="uploadVideo" :disabled="isUploading">
               {{ isUploading ? 'Загрузка...' : 'Отправить на обработку' }}
@@ -133,34 +214,42 @@
             <button class="text-btn" @click="cancelUpload">Сбросить форму</button>
           </div>
           <p v-if="isUploading" class="upload-note" role="status">
-            Сброс остановит ожидание ответа. Если сервер уже принял файл, обработка может продолжиться.
+            Сброс остановит ожидание ответа. Если сервер уже принял файл, обработка может
+            продолжиться.
           </p>
         </div>
-        
+
         <div v-else-if="jobId" class="job-status">
           <div class="status-header">
             <h3>Обработка видео</h3>
             <div class="job-id">ID: {{ jobId.substring(0, 8) }}...</div>
           </div>
-          
+
           <div class="status-info">
-            <div class="status-indicator" :class="jobStatus" role="status" aria-live="polite" aria-atomic="true">
+            <div
+              class="status-indicator"
+              :class="jobStatus"
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+            >
               <div class="status-dot"></div>
               <span>{{ getStatusText(jobStatus) }}</span>
             </div>
-            
+
             <div v-if="jobStatus === 'processing'" class="progress-details">
               <div class="progress-bar">
                 <div class="progress-fill" :style="{ width: processingProgress + '%' }"></div>
               </div>
               <div class="progress-text">
                 <span v-if="jobData">
-                  Обработано частей: {{ jobData.processed_batches || 0 }} из {{ jobData.total_batches || '?' }}
+                  Обработано частей: {{ jobData.processed_batches || 0 }} из
+                  {{ jobData.total_batches || '?' }}
                 </span>
                 <span v-else>Получаем состояние обработки…</span>
               </div>
             </div>
-            
+
             <div v-if="jobError" class="error-message" role="alert">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff4444">
                 <circle cx="12" cy="12" r="10"></circle>
@@ -169,16 +258,23 @@
               </svg>
               <span>Ошибка: {{ jobError }}</span>
             </div>
-            
+
             <div v-if="jobStatus === 'completed'" class="completion-info">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#00ff88" stroke-width="2">
+              <svg
+                width="40"
+                height="40"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#00ff88"
+                stroke-width="2"
+              >
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                 <polyline points="22 4 12 14.01 9 11.01"></polyline>
               </svg>
               <p>Видео обработано</p>
             </div>
           </div>
-          
+
           <div class="btn-group">
             <button v-if="jobStatus === 'completed'" class="stream-btn" @click="loadTranscription">
               Показать расшифровку
@@ -213,45 +309,43 @@
             </button>
           </div>
         </div>
-        <textarea ref="textareaRef" class="transcription-area" readonly v-model="transcribedText"
-                  aria-label="Распознанный текст"
-                  placeholder="Пока здесь пусто. Начните перевод с камеры или загрузите видео."></textarea>
+        <textarea
+          ref="textareaRef"
+          class="transcription-area"
+          readonly
+          v-model="transcribedText"
+          aria-label="Распознанный текст"
+          placeholder="Пока здесь пусто. Начните перевод с камеры или загрузите видео."
+        ></textarea>
       </section>
-
     </main>
   </div>
 </template>
 
 <script setup>
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
-import { getApiUrl, getWsUrl } from '../features/api/urls';
-import {
-  getRetryAfterDelay,
-  isTerminalPollingStatus,
-} from '../features/jobs/polling';
-import {
-  createRealtimeSession,
-  mergeTranscription,
-} from '../features/realtime/session';
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { getApiUrl, getWsUrl } from '../features/api/urls'
+import { getRetryAfterDelay, isTerminalPollingStatus } from '../features/jobs/polling'
+import { createRealtimeSession, mergeTranscription } from '../features/realtime/session'
 
-const MAX_UPLOAD_SIZE = 100 * 1024 * 1024;
-const POLL_BASE_DELAY = 2_000;
-const POLL_MAX_DELAY = 10_000;
-const POLL_REQUEST_TIMEOUT = 10_000;
-const POLL_TOTAL_TIMEOUT = 15 * 60_000;
+const MAX_UPLOAD_SIZE = 100 * 1024 * 1024
+const POLL_BASE_DELAY = 2_000
+const POLL_MAX_DELAY = 10_000
+const POLL_REQUEST_TIMEOUT = 10_000
+const POLL_TOTAL_TIMEOUT = 15 * 60_000
 
 // --- State ---
-const mode = ref('camera'); // 'camera' | 'upload'
-const streamState = ref('idle');
-const isStreaming = computed(() => streamState.value === 'streaming');
-const isConnecting = computed(() => streamState.value === 'connecting');
-const statusText = ref('Камера готова');
+const mode = ref('camera') // 'camera' | 'upload'
+const streamState = ref('idle')
+const isStreaming = computed(() => streamState.value === 'streaming')
+const isConnecting = computed(() => streamState.value === 'connecting')
+const statusText = ref('Камера готова')
 const statusDescription = computed(() => {
   if (streamState.value === 'connecting') {
-    return 'Проверяем камеру и соединение с сервером';
+    return 'Проверяем камеру и соединение с сервером'
   }
   if (streamState.value === 'streaming') {
-    return 'Показывайте жесты по одному в центральной области';
+    return 'Показывайте жесты по одному в центральной области'
   }
 
   const descriptions = {
@@ -259,427 +353,426 @@ const statusDescription = computed(() => {
     'Ошибка соединения': 'Попробуйте подключиться ещё раз',
     'Соединение закрыто': 'Перевод остановлен, можно запустить снова',
     'Нет сети': 'Проверьте интернет-соединение',
-  };
-  return descriptions[statusText.value] || 'Видео не записывается и не отправляется';
-});
-const transcribedText = ref('');
-const uploadedFile = ref(null);
-const jobId = ref(null);
-const jobStatus = ref(null);
-const jobData = ref(null);
-const jobError = ref(null);
-const uploadProgress = ref(0);
-const isUploading = ref(false);
-const isPolling = ref(false);
-const isDragOver = ref(false);
-const processingProgress = ref(0);
-const sidebarOpen = ref(false);
+  }
+  return descriptions[statusText.value] || 'Видео не записывается и не отправляется'
+})
+const transcribedText = ref('')
+const uploadedFile = ref(null)
+const jobId = ref(null)
+const jobStatus = ref(null)
+const jobData = ref(null)
+const jobError = ref(null)
+const uploadProgress = ref(0)
+const isUploading = ref(false)
+const isPolling = ref(false)
+const isDragOver = ref(false)
+const processingProgress = ref(0)
+const sidebarOpen = ref(false)
 
 // --- Refs ---
-const videoEl = ref(null);
-const canvasEl = ref(null);
-const fileInput = ref(null);
-const textareaRef = ref(null);
+const videoEl = ref(null)
+const canvasEl = ref(null)
+const fileInput = ref(null)
+const textareaRef = ref(null)
 
-let uploadGeneration = 0;
-let uploadController = null;
-let pollGeneration = 0;
-let pollTimer = null;
-let pollController = null;
-let pollStartedAt = 0;
-let pollDelay = POLL_BASE_DELAY;
+let uploadGeneration = 0
+let uploadController = null
+let pollGeneration = 0
+let pollTimer = null
+let pollController = null
+let pollStartedAt = 0
+let pollDelay = POLL_BASE_DELAY
 
 const realtimeSession = createRealtimeSession({
   getVideoElement: () => videoEl.value,
   getCanvasElement: () => canvasEl.value,
   getSocketUrl: () => getWsUrl('socket'),
   onStateChange(nextState, reason) {
-    streamState.value = nextState;
+    streamState.value = nextState
 
     if (nextState === 'connecting') {
-      statusText.value = 'Подключаемся';
+      statusText.value = 'Подключаемся'
     } else if (nextState === 'streaming') {
-      statusText.value = 'Перевод идёт';
-      transcribedText.value = '';
+      statusText.value = 'Перевод идёт'
+      transcribedText.value = ''
     } else if (reason === 'disconnected') {
-      statusText.value = 'Соединение закрыто';
+      statusText.value = 'Соединение закрыто'
     } else if (reason === 'error') {
-      statusText.value = 'Ошибка соединения';
+      statusText.value = 'Ошибка соединения'
     } else if (reason === 'camera-error') {
-      statusText.value = 'Камера недоступна';
+      statusText.value = 'Камера недоступна'
     } else if (reason === 'offline') {
-      statusText.value = 'Нет сети';
+      statusText.value = 'Нет сети'
     } else {
-      statusText.value = 'Камера готова';
+      statusText.value = 'Камера готова'
     }
   },
   onMessage(message) {
-    const nextText = mergeTranscription(transcribedText.value, message);
-    if (nextText === transcribedText.value) return;
+    const nextText = mergeTranscription(transcribedText.value, message)
+    if (nextText === transcribedText.value) return
 
-    transcribedText.value = nextText;
+    transcribedText.value = nextText
     nextTick(() => {
       if (textareaRef.value) {
-        textareaRef.value.scrollTop = textareaRef.value.scrollHeight;
+        textareaRef.value.scrollTop = textareaRef.value.scrollHeight
       }
-    });
+    })
   },
   onError(error) {
-    console.error('Realtime error:', error);
+    console.error('Realtime error:', error)
   },
-});
+})
 
 // --- Lifecycle ---
 onMounted(() => {
-  window.addEventListener('pagehide', handlePageHide);
-  window.addEventListener('offline', handleConnectionLoss);
-  document.addEventListener('visibilitychange', handleVisibilityChange);
-  void initCamera();
-});
+  window.addEventListener('pagehide', handlePageHide)
+  window.addEventListener('offline', handleConnectionLoss)
+  document.addEventListener('visibilitychange', handleVisibilityChange)
+  void initCamera()
+})
 
 onUnmounted(() => {
-  window.removeEventListener('pagehide', handlePageHide);
-  window.removeEventListener('offline', handleConnectionLoss);
-  document.removeEventListener('visibilitychange', handleVisibilityChange);
-  realtimeSession.destroy();
-  abortUpload();
-  stopPolling();
-});
+  window.removeEventListener('pagehide', handlePageHide)
+  window.removeEventListener('offline', handleConnectionLoss)
+  document.removeEventListener('visibilitychange', handleVisibilityChange)
+  realtimeSession.destroy()
+  abortUpload()
+  stopPolling()
+})
 
 function handlePageHide() {
-  realtimeSession.stop('pagehide');
-  abortUpload();
-  stopPolling();
+  realtimeSession.stop('pagehide')
+  abortUpload()
+  stopPolling()
 }
 
 function handleConnectionLoss() {
-  realtimeSession.stop('offline');
+  realtimeSession.stop('offline')
 }
 
 function handleVisibilityChange() {
   if (document.hidden) {
-    realtimeSession.stop('hidden');
+    realtimeSession.stop('hidden')
   }
 }
 
 // --- Camera Logic ---
 async function initCamera() {
-  if (mode.value !== 'camera') return;
+  if (mode.value !== 'camera') return
 
   try {
-    await realtimeSession.prepareCamera();
+    await realtimeSession.prepareCamera()
   } catch (error) {
-    console.error('Camera Init Error:', error);
+    console.error('Camera Init Error:', error)
     if (mode.value === 'camera') {
-      statusText.value = 'Камера недоступна';
+      statusText.value = 'Камера недоступна'
     }
   }
 }
 
 function setMode(newMode) {
-  if (mode.value === newMode) return;
+  if (mode.value === newMode) return
 
-  mode.value = newMode;
+  mode.value = newMode
   if (newMode === 'camera') {
-    resetUpload();
-    void initCamera();
+    resetUpload()
+    void initCamera()
   } else {
-    realtimeSession.stop('mode-change');
+    realtimeSession.stop('mode-change')
   }
 }
 
 function toggleStream() {
   if (isConnecting.value || isStreaming.value) {
-    realtimeSession.stop(isConnecting.value ? 'cancelled' : 'stopped');
+    realtimeSession.stop(isConnecting.value ? 'cancelled' : 'stopped')
   } else {
-    void realtimeSession.start();
+    void realtimeSession.start()
   }
 }
 
 // --- Upload Logic ---
 function triggerFileUpload() {
-  fileInput.value?.click();
+  fileInput.value?.click()
 }
 
 function handleDragOver(e) {
-  e.preventDefault();
-  isDragOver.value = true;
+  e.preventDefault()
+  isDragOver.value = true
 }
 
 function handleDragLeave() {
-  isDragOver.value = false;
+  isDragOver.value = false
 }
 
 function validateVideoFile(file) {
   if (!file || !file.type?.toLowerCase().startsWith('video/')) {
-    return 'Пожалуйста, выберите видеофайл';
+    return 'Пожалуйста, выберите видеофайл'
   }
   if (file.size > MAX_UPLOAD_SIZE) {
-    return 'Размер видео не должен превышать 100 МиБ';
+    return 'Размер видео не должен превышать 100 МиБ'
   }
-  return null;
+  return null
 }
 
 function selectVideoFile(file) {
-  const validationError = validateVideoFile(file);
+  const validationError = validateVideoFile(file)
   if (validationError) {
-    jobError.value = validationError;
-    alert(validationError);
-    return;
+    jobError.value = validationError
+    alert(validationError)
+    return
   }
 
-  uploadedFile.value = file;
-  jobError.value = null;
+  uploadedFile.value = file
+  jobError.value = null
 }
 
 function handleDrop(e) {
-  e.preventDefault();
-  isDragOver.value = false;
-  selectVideoFile(e.dataTransfer.files?.[0]);
+  e.preventDefault()
+  isDragOver.value = false
+  selectVideoFile(e.dataTransfer.files?.[0])
 }
 
 function handleFileSelect(e) {
-  const file = e.target.files?.[0];
+  const file = e.target.files?.[0]
   if (file) {
-    selectVideoFile(file);
+    selectVideoFile(file)
   }
 }
 
 function formatFileSize(bytes) {
-  if (bytes === 0) return '0 Bytes';
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  if (bytes === 0) return '0 Bytes'
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
 }
 
 function abortUpload() {
-  uploadGeneration += 1;
-  uploadController?.abort();
-  uploadController = null;
-  isUploading.value = false;
+  uploadGeneration += 1
+  uploadController?.abort()
+  uploadController = null
+  isUploading.value = false
 }
 
 async function uploadVideo() {
-  if (isUploading.value) return;
+  if (isUploading.value) return
 
-  const file = uploadedFile.value;
-  const validationError = validateVideoFile(file);
+  const file = uploadedFile.value
+  const validationError = validateVideoFile(file)
   if (validationError) {
-    jobError.value = validationError;
-    alert(validationError);
-    return;
+    jobError.value = validationError
+    alert(validationError)
+    return
   }
 
-  const requestGeneration = ++uploadGeneration;
-  const controller = new AbortController();
-  uploadController = controller;
-  isUploading.value = true;
-  uploadProgress.value = 0;
-  jobError.value = null;
+  const requestGeneration = ++uploadGeneration
+  const controller = new AbortController()
+  uploadController = controller
+  isUploading.value = true
+  uploadProgress.value = 0
+  jobError.value = null
 
-  const formData = new FormData();
-  formData.append('video', file);
-  formData.append('interval', '1');
+  const formData = new FormData()
+  formData.append('video', file)
+  formData.append('interval', '1')
 
   try {
     const response = await fetch(getApiUrl('upload'), {
       method: 'POST',
       body: formData,
       signal: controller.signal,
-    });
+    })
 
-    if (requestGeneration !== uploadGeneration) return;
+    if (requestGeneration !== uploadGeneration) return
     if (!response.ok) {
-      throw new Error(`Ошибка загрузки: ${response.status}`);
+      throw new Error(`Ошибка загрузки: ${response.status}`)
     }
 
-    const data = await response.json();
-    if (requestGeneration !== uploadGeneration) return;
+    const data = await response.json()
+    if (requestGeneration !== uploadGeneration) return
     if (!data.job_id) {
-      throw new Error('Не получен ID задания');
+      throw new Error('Не получен ID задания')
     }
 
-    uploadProgress.value = 100;
-    jobId.value = data.job_id;
-    jobStatus.value = data.status || 'queued';
-    startPolling();
+    uploadProgress.value = 100
+    jobId.value = data.job_id
+    jobStatus.value = data.status || 'queued'
+    startPolling()
   } catch (error) {
-    if (requestGeneration !== uploadGeneration || error.name === 'AbortError') return;
+    if (requestGeneration !== uploadGeneration || error.name === 'AbortError') return
 
-    console.error('Upload error:', error);
-    jobError.value = error.message;
-    alert(`Ошибка загрузки: ${error.message}`);
+    console.error('Upload error:', error)
+    jobError.value = error.message
+    alert(`Ошибка загрузки: ${error.message}`)
   } finally {
     if (requestGeneration === uploadGeneration) {
-      uploadController = null;
-      isUploading.value = false;
+      uploadController = null
+      isUploading.value = false
     }
   }
 }
 
 function isCurrentPoll(requestGeneration, polledJobId) {
-  return isPolling.value
-    && pollGeneration === requestGeneration
-    && jobId.value === polledJobId;
+  return isPolling.value && pollGeneration === requestGeneration && jobId.value === polledJobId
 }
 
 function startPolling() {
-  stopPolling();
-  if (!jobId.value) return;
+  stopPolling()
+  if (!jobId.value) return
 
-  const requestGeneration = ++pollGeneration;
-  const polledJobId = jobId.value;
-  isPolling.value = true;
-  pollStartedAt = Date.now();
-  pollDelay = POLL_BASE_DELAY;
-  void pollJobStatus(requestGeneration, polledJobId);
+  const requestGeneration = ++pollGeneration
+  const polledJobId = jobId.value
+  isPolling.value = true
+  pollStartedAt = Date.now()
+  pollDelay = POLL_BASE_DELAY
+  void pollJobStatus(requestGeneration, polledJobId)
 }
 
 function schedulePoll(requestGeneration, polledJobId) {
-  if (!isCurrentPoll(requestGeneration, polledJobId)) return;
+  if (!isCurrentPoll(requestGeneration, polledJobId)) return
 
   pollTimer = setTimeout(() => {
-    pollTimer = null;
-    void pollJobStatus(requestGeneration, polledJobId);
-  }, pollDelay);
+    pollTimer = null
+    void pollJobStatus(requestGeneration, polledJobId)
+  }, pollDelay)
 }
 
 async function pollJobStatus(requestGeneration, polledJobId) {
-  if (!isCurrentPoll(requestGeneration, polledJobId)) return;
+  if (!isCurrentPoll(requestGeneration, polledJobId)) return
 
   if (Date.now() - pollStartedAt >= POLL_TOTAL_TIMEOUT) {
-    jobStatus.value = 'failed';
-    jobError.value = 'Превышено время ожидания обработки';
-    stopPolling();
-    return;
+    jobStatus.value = 'failed'
+    jobError.value = 'Превышено время ожидания обработки'
+    stopPolling()
+    return
   }
 
-  const controller = new AbortController();
-  pollController = controller;
-  let requestTimedOut = false;
+  const controller = new AbortController()
+  pollController = controller
+  let requestTimedOut = false
   const timeoutId = setTimeout(() => {
-    requestTimedOut = true;
-    controller.abort();
-  }, POLL_REQUEST_TIMEOUT);
+    requestTimedOut = true
+    controller.abort()
+  }, POLL_REQUEST_TIMEOUT)
 
   try {
     const response = await fetch(getApiUrl(`job/${encodeURIComponent(polledJobId)}`), {
       signal: controller.signal,
-    });
+    })
 
-    if (!isCurrentPoll(requestGeneration, polledJobId)) return;
+    if (!isCurrentPoll(requestGeneration, polledJobId)) return
     if (isTerminalPollingStatus(response.status)) {
-      jobStatus.value = 'failed';
-      jobError.value = response.status === 404
-        ? 'Задание не найдено'
-        : `Запрос статуса отклонён сервером (${response.status})`;
-      stopPolling();
-      return;
+      jobStatus.value = 'failed'
+      jobError.value =
+        response.status === 404
+          ? 'Задание не найдено'
+          : `Запрос статуса отклонён сервером (${response.status})`
+      stopPolling()
+      return
     }
     if (response.status === 429) {
-      jobError.value = 'Сервер занят. Ожидаем разрешённое время перед повтором...';
+      jobError.value = 'Сервер занят. Ожидаем разрешённое время перед повтором...'
       pollDelay = getRetryAfterDelay(
         response.headers.get('Retry-After'),
         Math.min(pollDelay * 2, POLL_MAX_DELAY),
-      );
-      return;
+      )
+      return
     }
     if (!response.ok) {
-      throw new Error(`Сервер вернул статус ${response.status}`);
+      throw new Error(`Сервер вернул статус ${response.status}`)
     }
 
-    const data = await response.json();
-    if (!isCurrentPoll(requestGeneration, polledJobId)) return;
+    const data = await response.json()
+    if (!isCurrentPoll(requestGeneration, polledJobId)) return
 
-    jobData.value = data;
-    jobStatus.value = data.status;
-    jobError.value = data.error || null;
-    pollDelay = POLL_BASE_DELAY;
+    jobData.value = data
+    jobStatus.value = data.status
+    jobError.value = data.error || null
+    pollDelay = POLL_BASE_DELAY
 
     if (data.total_batches > 0) {
       processingProgress.value = Math.round(
         ((data.processed_batches || 0) / data.total_batches) * 100,
-      );
+      )
     }
 
     if (data.status === 'completed') {
-      stopPolling();
-      loadTranscription();
+      stopPolling()
+      loadTranscription()
     } else if (data.status === 'failed') {
-      stopPolling();
+      stopPolling()
     }
   } catch (error) {
-    if (!isCurrentPoll(requestGeneration, polledJobId)) return;
-    if (controller.signal.aborted && !requestTimedOut) return;
+    if (!isCurrentPoll(requestGeneration, polledJobId)) return
+    if (controller.signal.aborted && !requestTimedOut) return
 
-    console.error('Polling error:', error);
+    console.error('Polling error:', error)
     jobError.value = requestTimedOut
       ? 'Сервер не ответил вовремя. Повторяем запрос...'
-      : 'Ошибка получения статуса. Повторяем запрос...';
-    pollDelay = Math.min(pollDelay * 2, POLL_MAX_DELAY);
+      : 'Ошибка получения статуса. Повторяем запрос...'
+    pollDelay = Math.min(pollDelay * 2, POLL_MAX_DELAY)
   } finally {
-    clearTimeout(timeoutId);
+    clearTimeout(timeoutId)
     if (pollController === controller) {
-      pollController = null;
+      pollController = null
     }
-    schedulePoll(requestGeneration, polledJobId);
+    schedulePoll(requestGeneration, polledJobId)
   }
 }
 
 function stopPolling() {
-  pollGeneration += 1;
+  pollGeneration += 1
 
   if (pollTimer) {
-    clearTimeout(pollTimer);
-    pollTimer = null;
+    clearTimeout(pollTimer)
+    pollTimer = null
   }
-  pollController?.abort();
-  pollController = null;
-  isPolling.value = false;
+  pollController?.abort()
+  pollController = null
+  isPolling.value = false
 }
 
 function loadTranscription() {
-  let fullText = '';
+  let fullText = ''
   if (typeof jobData.value?.full_text === 'string') {
-    fullText = jobData.value.full_text;
+    fullText = jobData.value.full_text
   } else if (Array.isArray(jobData.value?.transcription)) {
-    fullText = jobData.value.transcription.join(' ');
+    fullText = jobData.value.transcription.join(' ')
   }
 
-  transcribedText.value = mergeTranscription('', { full_text: fullText });
+  transcribedText.value = mergeTranscription('', { full_text: fullText })
 }
 
 function retryProcessing() {
-  if (!uploadedFile.value) return;
+  if (!uploadedFile.value) return
 
-  jobId.value = null;
-  jobStatus.value = null;
-  jobData.value = null;
-  jobError.value = null;
-  processingProgress.value = 0;
-  transcribedText.value = '';
-  void uploadVideo();
+  jobId.value = null
+  jobStatus.value = null
+  jobData.value = null
+  jobError.value = null
+  processingProgress.value = 0
+  transcribedText.value = ''
+  void uploadVideo()
 }
 
 function cancelUpload() {
-  resetUpload();
+  resetUpload()
 }
 
 function resetUpload() {
-  abortUpload();
-  stopPolling();
-  uploadedFile.value = null;
-  jobId.value = null;
-  jobStatus.value = null;
-  jobData.value = null;
-  jobError.value = null;
-  uploadProgress.value = 0;
-  isDragOver.value = false;
-  processingProgress.value = 0;
+  abortUpload()
+  stopPolling()
+  uploadedFile.value = null
+  jobId.value = null
+  jobStatus.value = null
+  jobData.value = null
+  jobError.value = null
+  uploadProgress.value = 0
+  isDragOver.value = false
+  processingProgress.value = 0
 
   if (fileInput.value) {
-    fileInput.value.value = '';
+    fileInput.value.value = ''
   }
 }
 
@@ -689,37 +782,42 @@ function getStatusText(status) {
     processing: 'Обработка...',
     completed: 'Завершено',
     failed: 'Ошибка',
-  };
-  return statusMap[status] || status;
+  }
+  return statusMap[status] || status
 }
 
 // --- Sidebar ---
 function toggleSidebar() {
-  sidebarOpen.value = !sidebarOpen.value;
+  sidebarOpen.value = !sidebarOpen.value
+}
+
+function selectMobileMode(newMode) {
+  setMode(newMode)
+  sidebarOpen.value = false
 }
 
 // --- Export ---
 function downloadText() {
-  if (!transcribedText.value) return;
+  if (!transcribedText.value) return
 
-  const blob = new Blob([transcribedText.value], { type: 'text/plain' });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement('a');
-  anchor.href = url;
-  anchor.download = `transcription_${Date.now()}.txt`;
-  document.body.appendChild(anchor);
+  const blob = new Blob([transcribedText.value], { type: 'text/plain' })
+  const url = URL.createObjectURL(blob)
+  const anchor = document.createElement('a')
+  anchor.href = url
+  anchor.download = `transcription_${Date.now()}.txt`
+  document.body.appendChild(anchor)
 
   try {
-    anchor.click();
+    anchor.click()
   } finally {
-    anchor.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 0);
+    anchor.remove()
+    setTimeout(() => URL.revokeObjectURL(url), 0)
   }
 }
 </script>
 
 <style scoped>
-/* Calm translation workspace: visual polish layer */
+/* Optical translation workspace: one liquid-glass focal surface */
 .app-container {
   --space-xs: 4px;
   --space-sm: 8px;
@@ -728,10 +826,19 @@ function downloadText() {
   --space-xl: 24px;
   --space-2xl: 32px;
   --space-3xl: 48px;
+  --ink: #f8f6ff;
+  --ink-muted: #b8b1c9;
+  --violet: #8d5cff;
+  --violet-bright: #b18cff;
+  --cyan: #00f2ff;
+  --green: #00ff88;
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
   font-family: 'Golos Text', 'Segoe UI', sans-serif;
   font-kerning: normal;
-  background: #0f0f13;
-  color: #fff;
+  background:
+    radial-gradient(circle at 10% -16%, rgba(141, 92, 255, 0.28), transparent 34%),
+    radial-gradient(circle at 96% 116%, rgba(0, 242, 255, 0.12), transparent 30%), #0e0c16;
+  color: var(--ink);
   min-height: 100dvh;
   height: 100dvh;
   display: flex;
@@ -740,6 +847,24 @@ function downloadText() {
   gap: var(--space-lg);
   position: relative;
   overflow: hidden;
+}
+
+.app-container::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  content: '';
+  pointer-events: none;
+  opacity: 0.22;
+  background-image: repeating-radial-gradient(
+    circle at 18% 12%,
+    rgba(255, 255, 255, 0.13) 0,
+    rgba(255, 255, 255, 0.13) 0.6px,
+    transparent 0.7px,
+    transparent 6px
+  );
+  -webkit-mask-image: linear-gradient(to bottom, black, transparent 58%);
+  mask-image: linear-gradient(to bottom, black, transparent 58%);
 }
 
 .skip-link {
@@ -781,10 +906,11 @@ function downloadText() {
   flex: 0 0 64px;
   height: 64px;
   padding: 0 var(--space-xl);
-  background: #1a1a2e;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 10px;
-  backdrop-filter: none;
+  background: rgba(25, 21, 44, 0.84);
+  border: 1px solid rgba(194, 170, 255, 0.18);
+  border-radius: 18px;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px) saturate(1.15);
 }
 
 .mobile-header,
@@ -842,22 +968,29 @@ function downloadText() {
   margin: 0;
   padding: 0 var(--space-lg);
   border: 0;
-  border-bottom: 2px solid transparent;
-  border-radius: 0;
+  border: 1px solid transparent;
+  border-radius: 12px;
   background: transparent;
-  color: #a0a0a0;
+  color: var(--ink-muted);
   font-family: 'Golos Text', 'Segoe UI', sans-serif;
   font-size: 0.9375rem;
   font-weight: 500;
   line-height: 1.4;
   text-shadow: none;
-  transition: color 160ms ease-out, border-color 160ms ease-out;
+  transition:
+    color 180ms ease-out,
+    border-color 180ms ease-out,
+    background-color 180ms ease-out,
+    transform 180ms var(--ease-out-quint);
 }
 
 .desktop-header .mode-switch button.active {
-  color: #fff;
-  border-bottom-color: #00f2ff;
-  background: transparent;
+  color: var(--ink);
+  border-color: rgba(194, 170, 255, 0.34);
+  background: #6840c7;
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.18),
+    0 8px 22px rgba(77, 42, 153, 0.28);
   text-shadow: none;
 }
 
@@ -869,19 +1002,82 @@ function downloadText() {
 
 .desktop-header .nav-link:hover,
 .desktop-header .mode-switch button:hover {
-  color: #fff;
-  background: transparent;
+  color: var(--ink);
+  background: rgba(141, 92, 255, 0.14);
+  transform: translateY(-1px);
   text-shadow: none;
 }
 
 .content-wrapper {
+  position: relative;
+  isolation: isolate;
   z-index: 1;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(320px, 28vw);
-  gap: var(--space-lg);
+  gap: 10px;
+  padding: 10px;
   flex: 1;
   min-height: 0;
   height: auto;
+  border: 1px solid rgba(214, 197, 255, 0.24);
+  border-radius: 30px 30px 20px 30px;
+  background:
+    linear-gradient(
+      115deg,
+      rgba(255, 255, 255, 0.11),
+      transparent 19%,
+      transparent 76%,
+      rgba(141, 92, 255, 0.12)
+    ),
+    rgba(31, 25, 52, 0.56);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.18),
+    inset 0 -1px rgba(113, 75, 190, 0.14),
+    0 30px 90px rgba(6, 3, 18, 0.5),
+    0 0 42px rgba(103, 58, 190, 0.1);
+  backdrop-filter: blur(22px) saturate(1.22);
+  animation: workspace-enter 680ms var(--ease-out-quint) both;
+}
+
+.content-wrapper::before {
+  position: absolute;
+  z-index: -1;
+  top: -96px;
+  left: 4%;
+  width: min(46vw, 560px);
+  height: 220px;
+  content: '';
+  pointer-events: none;
+  border-radius: 48% 52% 62% 38% / 38% 48% 52% 62%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(141, 92, 255, 0.38),
+    rgba(93, 52, 171, 0.1) 52%,
+    transparent 72%
+  );
+  filter: blur(28px);
+  animation: liquid-drift 12s ease-in-out infinite alternate;
+}
+
+.content-wrapper::after {
+  position: absolute;
+  z-index: 4;
+  inset: 1px;
+  content: '';
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    linear-gradient(
+      112deg,
+      rgba(255, 255, 255, 0.2),
+      transparent 13%,
+      transparent 84%,
+      rgba(177, 140, 255, 0.12)
+    ),
+    radial-gradient(circle at 92% 8%, rgba(255, 255, 255, 0.16), transparent 11%);
+  -webkit-mask-image: linear-gradient(to bottom, black, transparent 20%, transparent 80%, black);
+  mask-image: linear-gradient(to bottom, black, transparent 20%, transparent 80%, black);
+  opacity: 0.78;
 }
 
 .video-viewport {
@@ -892,11 +1088,30 @@ function downloadText() {
   min-width: 0;
   min-height: 0;
   padding: var(--space-xl);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 12px;
-  background: #000;
-  box-shadow: none;
+  border: 1px solid rgba(231, 222, 255, 0.14);
+  border-radius: 22px 16px 16px 22px;
+  background:
+    radial-gradient(circle at 22% 18%, rgba(141, 92, 255, 0.14), transparent 34%), #08070d;
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.07),
+    0 14px 32px rgba(7, 3, 18, 0.34);
   overflow: hidden;
+}
+
+.video-viewport::after {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  content: '';
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(
+    122deg,
+    rgba(255, 255, 255, 0.055),
+    transparent 24%,
+    transparent 78%,
+    rgba(141, 92, 255, 0.055)
+  );
 }
 
 .video-viewport video {
@@ -920,10 +1135,13 @@ function downloadText() {
   max-width: calc(100% - 48px);
   padding: var(--space-md) var(--space-lg);
   gap: var(--space-md);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 8px;
-  background: #0f0f13;
-  backdrop-filter: none;
+  border: 1px solid rgba(226, 214, 255, 0.24);
+  border-radius: 16px 16px 16px 8px;
+  background: rgba(15, 12, 27, 0.68);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.12),
+    0 12px 30px rgba(5, 3, 13, 0.26);
+  backdrop-filter: blur(16px) saturate(1.22);
 }
 
 .video-ui-top > div:last-child {
@@ -936,18 +1154,20 @@ function downloadText() {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #888;
-  box-shadow: none;
+  background: #777184;
+  box-shadow: 0 0 0 4px rgba(119, 113, 132, 0.16);
 }
 
 .recording-dot.active {
   background: #ff4444;
-  box-shadow: none;
+  box-shadow:
+    0 0 0 5px rgba(255, 68, 68, 0.18),
+    0 0 18px rgba(255, 68, 68, 0.36);
   animation: pulse 1.6s ease-in-out infinite;
 }
 
 .video-ui-top .status-name {
-  color: #fff;
+  color: var(--ink);
   font-size: 0.9375rem;
   font-weight: 600;
   line-height: 1.35;
@@ -956,7 +1176,7 @@ function downloadText() {
 }
 
 .video-ui-top .status-description {
-  color: #a0a0a0;
+  color: var(--ink-muted);
   font-size: 0.8125rem;
   font-weight: 400;
   line-height: 1.45;
@@ -972,16 +1192,22 @@ function downloadText() {
   transform: translate(-50%, -50%);
   width: min(38%, 320px);
   height: min(48%, 320px);
-  border: 1px dashed rgba(255,255,255,0.2);
-  border-radius: 10px;
-  box-shadow: none;
+  border: 1px dashed rgba(214, 197, 255, 0.3);
+  border-radius: 22px;
+  box-shadow: 0 0 0 1px rgba(141, 92, 255, 0.04) inset;
   pointer-events: none;
-  transition: border-color 180ms ease-out;
+  transition:
+    border-color 220ms ease-out,
+    box-shadow 220ms ease-out,
+    transform 220ms var(--ease-out-quint);
 }
 
 .hand-tracking-box.active {
-  border-color: #00f2ff;
-  box-shadow: none;
+  border-color: var(--cyan);
+  box-shadow:
+    0 0 0 1px rgba(0, 242, 255, 0.16) inset,
+    0 0 28px rgba(0, 242, 255, 0.14);
+  transform: translate(-50%, -50%) scale(1.015);
 }
 
 .video-controls {
@@ -1000,40 +1226,55 @@ function downloadText() {
   justify-content: center;
   min-height: 52px;
   padding: var(--space-md) var(--space-xl);
-  border: 1px solid #00ff88;
-  border-radius: 8px;
-  background: #0f0f13;
-  color: #00ff88;
+  border: 1px solid rgba(113, 255, 186, 0.7);
+  border-radius: 15px;
+  background: #00d876;
+  color: #07170f;
   font-family: 'Golos Text', 'Segoe UI', sans-serif;
   font-size: 1rem;
   font-weight: 600;
   line-height: 1.4;
   letter-spacing: 0;
   text-transform: none;
-  backdrop-filter: none;
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.35),
+    0 12px 28px rgba(0, 216, 118, 0.24);
+  backdrop-filter: blur(12px);
   cursor: pointer;
-  transition: background-color 160ms ease-out, color 160ms ease-out, transform 120ms ease-out;
+  transition:
+    background-color 180ms ease-out,
+    color 180ms ease-out,
+    border-color 180ms ease-out,
+    box-shadow 180ms ease-out,
+    transform 180ms var(--ease-out-quint);
 }
 
 .stream-btn:hover:not(:disabled) {
-  background: #00ff88;
-  color: #000;
-  box-shadow: none;
+  background: var(--green);
+  color: #06140e;
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.38),
+    0 16px 36px rgba(0, 255, 136, 0.3);
+  transform: translateY(-2px);
 }
 
 .stream-btn:active:not(:disabled) {
-  transform: translateY(1px);
+  transform: translateY(0) scale(0.985);
 }
 
 .stream-btn.is-recording {
   border-color: #ff4444;
-  color: #ff4444;
+  background: rgba(64, 16, 30, 0.9);
+  color: #ff9aaa;
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.1),
+    0 12px 28px rgba(255, 68, 68, 0.16);
 }
 
 .stream-btn.is-recording:hover {
   background: #ff4444;
   color: #fff;
-  box-shadow: none;
+  box-shadow: 0 16px 34px rgba(255, 68, 68, 0.24);
 }
 
 .stream-btn:disabled,
@@ -1045,7 +1286,8 @@ function downloadText() {
 
 .upload-viewport {
   flex-direction: column;
-  background: #1a1a2e;
+  background:
+    radial-gradient(circle at 78% 20%, rgba(141, 92, 255, 0.16), transparent 36%), #131020;
 }
 
 .upload-zone {
@@ -1058,29 +1300,37 @@ function downloadText() {
   min-height: 300px;
   padding: var(--space-3xl) var(--space-xl);
   gap: var(--space-md);
-  border: 1px dashed rgba(255,255,255,0.3);
-  border-radius: 10px;
-  background: #0f0f13;
+  border: 1px dashed rgba(194, 170, 255, 0.42);
+  border-radius: 22px 12px 22px 22px;
+  background: rgba(12, 10, 21, 0.48);
   text-align: center;
   cursor: pointer;
+  transition:
+    border-color 220ms ease-out,
+    background-color 220ms ease-out,
+    transform 220ms var(--ease-out-quint),
+    box-shadow 220ms ease-out;
 }
 
 .upload-zone:hover,
 .upload-zone.is-dragover {
-  border-color: #00f2ff;
-  background: #0f0f13;
+  border-color: var(--violet-bright);
+  background: rgba(66, 37, 123, 0.25);
+  box-shadow: 0 18px 48px rgba(39, 18, 82, 0.24);
+  transform: translateY(-2px);
 }
 
 .upload-zone svg {
   width: 44px;
   height: 44px;
   margin-bottom: var(--space-sm);
-  stroke: #a0a0a0;
+  stroke: var(--violet-bright);
+  filter: drop-shadow(0 8px 18px rgba(141, 92, 255, 0.24));
 }
 
 .upload-text {
   margin: 0;
-  color: #fff;
+  color: var(--ink);
   font-family: 'Onest', 'Segoe UI', sans-serif;
   font-size: 1.25rem;
   font-weight: 600;
@@ -1089,7 +1339,7 @@ function downloadText() {
 
 .upload-subtext,
 .upload-formats {
-  color: #a0a0a0;
+  color: var(--ink-muted);
   font-size: 0.9375rem;
   line-height: 1.5;
 }
@@ -1113,9 +1363,10 @@ function downloadText() {
   align-items: center;
   gap: var(--space-lg);
   padding: var(--space-xl);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 10px;
-  background: #0f0f13;
+  border: 1px solid rgba(194, 170, 255, 0.18);
+  border-radius: 18px;
+  background: rgba(15, 12, 26, 0.72);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.06);
 }
 
 .file-details {
@@ -1141,19 +1392,20 @@ function downloadText() {
 .file-size,
 .progress-text,
 .upload-note {
-  color: #a0a0a0;
+  color: var(--ink-muted);
 }
 
 .progress-bar {
   height: 6px;
   border-radius: 3px;
-  background: rgba(255,255,255,0.1);
+  background: rgba(218, 205, 255, 0.12);
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background: #00f2ff;
+  background: var(--violet);
+  box-shadow: 0 0 18px rgba(141, 92, 255, 0.34);
   transition: width 180ms ease-out;
 }
 
@@ -1180,23 +1432,27 @@ function downloadText() {
 .export-btn {
   min-height: 44px;
   padding: var(--space-sm) var(--space-lg);
-  border: 1px solid rgba(255,255,255,0.3);
-  border-radius: 8px;
-  background: transparent;
-  color: #fff;
+  border: 1px solid rgba(194, 170, 255, 0.24);
+  border-radius: 12px;
+  background: rgba(141, 92, 255, 0.08);
+  color: var(--ink);
   font-family: 'Golos Text', 'Segoe UI', sans-serif;
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 160ms ease-out, border-color 160ms ease-out;
+  transition:
+    background-color 180ms ease-out,
+    border-color 180ms ease-out,
+    transform 180ms var(--ease-out-quint);
 }
 
 .text-btn:hover:not(:disabled),
 .polling-btn:hover,
 .export-btn:hover:not(:disabled) {
-  border-color: rgba(255,255,255,0.5);
-  background: rgba(255,255,255,0.1);
-  color: #fff;
+  border-color: rgba(194, 170, 255, 0.56);
+  background: rgba(141, 92, 255, 0.18);
+  color: var(--ink);
+  transform: translateY(-1px);
 }
 
 .upload-note {
@@ -1210,7 +1466,7 @@ function downloadText() {
   justify-content: space-between;
   gap: var(--space-lg);
   padding-bottom: var(--space-lg);
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(194, 170, 255, 0.16);
 }
 
 .status-header h3 {
@@ -1226,7 +1482,7 @@ function downloadText() {
 }
 
 .job-id {
-  color: #a0a0a0;
+  color: var(--ink-muted);
   font-size: 0.8125rem;
 }
 
@@ -1247,8 +1503,8 @@ function downloadText() {
   align-items: center;
   gap: var(--space-md);
   padding: var(--space-lg);
-  border: 1px solid rgba(255,255,255,0.1);
-  background: #0f0f13;
+  border: 1px solid rgba(194, 170, 255, 0.16);
+  background: rgba(14, 12, 24, 0.72);
 }
 
 .status-dot {
@@ -1258,14 +1514,31 @@ function downloadText() {
   background: #888;
 }
 
-.status-indicator.queued { border-color: #ffaa00; }
-.status-indicator.processing { border-color: #00f2ff; }
-.status-indicator.completed { border-color: #00ff88; }
-.status-indicator.failed { border-color: #ff4444; }
-.status-indicator.queued .status-dot { background: #ffaa00; }
-.status-indicator.processing .status-dot { background: #00f2ff; animation: pulse 1.4s ease-in-out infinite; }
-.status-indicator.completed .status-dot { background: #00ff88; }
-.status-indicator.failed .status-dot { background: #ff4444; }
+.status-indicator.queued {
+  border-color: #ffaa00;
+}
+.status-indicator.processing {
+  border-color: var(--violet-bright);
+}
+.status-indicator.completed {
+  border-color: #00ff88;
+}
+.status-indicator.failed {
+  border-color: #ff4444;
+}
+.status-indicator.queued .status-dot {
+  background: #ffaa00;
+}
+.status-indicator.processing .status-dot {
+  background: var(--violet-bright);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+.status-indicator.completed .status-dot {
+  background: #00ff88;
+}
+.status-indicator.failed .status-dot {
+  background: #ff4444;
+}
 
 .error-message {
   display: flex;
@@ -1273,8 +1546,8 @@ function downloadText() {
   line-height: 1.5;
   gap: var(--space-md);
   padding: var(--space-lg);
-  border: 1px solid rgba(255,68,68,0.3);
-  background: rgba(255,68,68,0.1);
+  border: 1px solid rgba(255, 68, 68, 0.3);
+  background: rgba(255, 68, 68, 0.1);
   color: #ff8888;
 }
 
@@ -1284,8 +1557,8 @@ function downloadText() {
   align-items: center;
   gap: var(--space-md);
   padding: var(--space-xl);
-  border: 1px solid rgba(0,255,136,0.2);
-  background: rgba(0,255,136,0.05);
+  border: 1px solid rgba(0, 255, 136, 0.2);
+  background: rgba(0, 255, 136, 0.05);
   color: #00ff88;
   text-align: center;
 }
@@ -1301,10 +1574,14 @@ function downloadText() {
   min-width: 0;
   min-height: 0;
   padding: var(--space-xl);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 12px;
-  background: #1a1a2e;
-  backdrop-filter: none;
+  border: 1px solid rgba(214, 197, 255, 0.13);
+  border-radius: 16px 22px 22px 16px;
+  background: rgba(20, 16, 35, 0.88);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.07),
+    0 14px 34px rgba(7, 3, 18, 0.22);
+  backdrop-filter: blur(12px) saturate(1.12);
+  animation: panel-enter 580ms 90ms var(--ease-out-quint) both;
 }
 
 .panel-header {
@@ -1323,7 +1600,7 @@ function downloadText() {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  color: #fff;
+  color: var(--ink);
   font-family: 'Onest', 'Segoe UI', sans-serif;
   font-size: 1.125rem;
   font-weight: 600;
@@ -1332,10 +1609,22 @@ function downloadText() {
   text-transform: none;
 }
 
+.panel-title::before {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 auto;
+  content: '';
+  border-radius: 50% 40% 52% 46%;
+  background: var(--violet-bright);
+  box-shadow:
+    0 0 0 5px rgba(141, 92, 255, 0.12),
+    0 0 20px rgba(141, 92, 255, 0.32);
+}
+
 .panel-caption {
   max-width: 36ch;
   margin: var(--space-xs) 0 0;
-  color: #a0a0a0;
+  color: var(--ink-muted);
   font-size: 0.8125rem;
   line-height: 1.5;
 }
@@ -1344,8 +1633,8 @@ function downloadText() {
   flex: 0 0 auto;
   border-radius: 4px;
   padding: 2px 6px;
-  background: rgba(0,242,255,0.2);
-  color: #00f2ff;
+  background: rgba(141, 92, 255, 0.2);
+  color: #d3beff;
   font-size: 0.75rem;
 }
 
@@ -1367,7 +1656,8 @@ function downloadText() {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #00f2ff;
+  background: var(--violet-bright);
+  box-shadow: 0 0 14px rgba(141, 92, 255, 0.46);
   animation: pulse 1.4s ease-in-out infinite;
 }
 
@@ -1376,31 +1666,80 @@ function downloadText() {
   width: 100%;
   min-height: 180px;
   padding: var(--space-lg);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 8px;
-  background: #0f0f13;
-  color: #fff;
+  border: 1px solid rgba(194, 170, 255, 0.18);
+  border-radius: 14px 14px 18px 14px;
+  background: radial-gradient(circle at 100% 0, rgba(141, 92, 255, 0.09), transparent 28%), #0e0c18;
+  color: var(--ink);
   font-family: 'Golos Text', 'Segoe UI', sans-serif;
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.65;
   resize: none;
   outline: none;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.04);
+  transition:
+    border-color 180ms ease-out,
+    box-shadow 180ms ease-out;
+}
+
+.transcription-area:focus {
+  border-color: rgba(177, 140, 255, 0.56);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.05),
+    0 0 0 4px rgba(141, 92, 255, 0.1);
 }
 
 .transcription-area::placeholder {
-  color: #a0a0a0;
+  color: var(--ink-muted);
   opacity: 1;
 }
 
 .app-container :is(button, a, [role='button'], textarea):focus-visible {
-  outline: 3px solid #00f2ff;
+  outline: 3px solid #c5a8ff;
   outline-offset: 3px;
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.35; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@keyframes workspace-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.992);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes panel-enter {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes liquid-drift {
+  from {
+    opacity: 0.72;
+    transform: translate3d(-1.5%, -1%, 0) rotate(-2deg);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(3%, 3%, 0) rotate(3deg);
+  }
 }
 
 @media (max-width: 1100px) {
@@ -1430,8 +1769,7 @@ function downloadText() {
     height: auto;
     min-height: 100dvh;
     overflow: visible;
-    padding:
-      max(var(--space-md), env(safe-area-inset-top))
+    padding: max(var(--space-md), env(safe-area-inset-top))
       max(var(--space-md), env(safe-area-inset-right))
       max(var(--space-xl), env(safe-area-inset-bottom))
       max(var(--space-md), env(safe-area-inset-left));
@@ -1448,9 +1786,11 @@ function downloadText() {
     min-height: 60px;
     height: auto;
     padding: 0 var(--space-md);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 10px;
-    background: #1a1a2e;
+    border: 1px solid rgba(194, 170, 255, 0.2);
+    border-radius: 17px;
+    background: rgba(25, 21, 44, 0.86);
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(14px) saturate(1.14);
   }
 
   .compact-logo {
@@ -1462,11 +1802,11 @@ function downloadText() {
     width: 44px;
     height: 44px;
     padding: 0;
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 8px;
-    background: transparent;
-    color: #fff;
-    backdrop-filter: none;
+    border: 1px solid rgba(194, 170, 255, 0.26);
+    border-radius: 12px;
+    background: rgba(141, 92, 255, 0.1);
+    color: var(--ink);
+    backdrop-filter: blur(10px);
   }
 
   .mobile-sidebar {
@@ -1476,7 +1816,9 @@ function downloadText() {
     z-index: 1000;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 180ms ease-out, visibility 180ms ease-out;
+    transition:
+      opacity 180ms ease-out,
+      visibility 180ms ease-out;
   }
 
   .mobile-sidebar.open {
@@ -1487,8 +1829,8 @@ function downloadText() {
   .sidebar-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: none;
+    background: rgba(7, 4, 17, 0.72);
+    backdrop-filter: blur(8px);
   }
 
   .sidebar-content {
@@ -1497,12 +1839,15 @@ function downloadText() {
     bottom: 0;
     left: 0;
     width: min(320px, 88vw);
-    padding:
-      max(var(--space-xl), env(safe-area-inset-top))
-      var(--space-xl)
+    padding: max(var(--space-xl), env(safe-area-inset-top)) var(--space-xl)
       max(var(--space-xl), env(safe-area-inset-bottom));
-    border-right: 1px solid rgba(255,255,255,0.2);
-    background: #0f0f13;
+    border-right: 1px solid rgba(194, 170, 255, 0.22);
+    background:
+      radial-gradient(circle at 0 0, rgba(141, 92, 255, 0.26), transparent 36%),
+      rgba(16, 13, 27, 0.96);
+    box-shadow:
+      28px 0 70px rgba(4, 2, 12, 0.48),
+      inset -1px 0 rgba(255, 255, 255, 0.06);
     transform: translateX(-100%);
     transition: transform 220ms ease-out;
   }
@@ -1519,7 +1864,7 @@ function downloadText() {
     justify-content: space-between;
     gap: var(--space-lg);
     padding-bottom: var(--space-lg);
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     font-family: 'Onest', 'Segoe UI', sans-serif;
     font-size: 1.125rem;
     font-weight: 600;
@@ -1540,11 +1885,11 @@ function downloadText() {
     margin: 0;
     padding: var(--space-md) var(--space-lg);
     border: 1px solid transparent;
-    border-radius: 8px;
+    border-radius: 12px;
     background: transparent;
     font-family: 'Golos Text', 'Segoe UI', sans-serif;
     font-size: 1rem;
-    color: #a0a0a0;
+    color: var(--ink-muted);
     cursor: pointer;
     text-align: left;
     text-decoration: none;
@@ -1552,30 +1897,37 @@ function downloadText() {
   }
 
   .sidebar-nav button.active {
-    border-color: rgba(255,255,255,0.2);
-    background: #1a1a2e;
-    color: #fff;
+    border-color: rgba(194, 170, 255, 0.3);
+    background: #6840c7;
+    color: var(--ink);
+    box-shadow:
+      inset 0 1px rgba(255, 255, 255, 0.14),
+      0 12px 26px rgba(64, 32, 128, 0.24);
     text-shadow: none;
   }
 
   .sidebar-nav .nav-link:hover,
   .sidebar-nav button:hover {
-    background: #1a1a2e;
+    background: rgba(141, 92, 255, 0.16);
     text-shadow: none;
   }
 
   .content-wrapper {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-md);
+    gap: 8px;
+    padding: 7px;
     height: auto;
     min-height: 0;
+    border-radius: 23px 23px 18px 23px;
+    backdrop-filter: blur(16px) saturate(1.16);
   }
 
   .video-viewport {
     width: 100%;
     height: clamp(320px, 52dvh, 460px);
     padding: var(--space-lg);
+    border-radius: 17px 14px 14px 17px;
   }
 
   .video-ui-top {
@@ -1623,6 +1975,7 @@ function downloadText() {
   .transcription-panel {
     min-height: 340px;
     padding: var(--space-lg);
+    border-radius: 14px 14px 17px 17px;
   }
 
   .panel-header {

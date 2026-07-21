@@ -8,14 +8,14 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: ModernView
+      component: ModernView,
     },
     {
       path: '/simple/',
       name: 'simple',
-      component: SimpleView
-    }
-  ]
+      component: SimpleView,
+    },
+  ],
 })
 
 export default router
