@@ -588,14 +588,14 @@ onMounted(() => {
   window.addEventListener('offline', handleConnectionLoss)
   document.addEventListener('visibilitychange', handleVisibilityChange)
   mobileViewportQuery = window.matchMedia?.('(max-width: 900px)') || null
-  mobileViewportQuery?.addEventListener('change', handleMobileViewportChange)
+  addMobileViewportListener(mobileViewportQuery)
 })
 
 onUnmounted(() => {
   window.removeEventListener('pagehide', handlePageHide)
   window.removeEventListener('offline', handleConnectionLoss)
   document.removeEventListener('visibilitychange', handleVisibilityChange)
-  mobileViewportQuery?.removeEventListener('change', handleMobileViewportChange)
+  removeMobileViewportListener(mobileViewportQuery)
   mobileViewportQuery = null
   realtimeSession.destroy()
   abortUpload()
@@ -621,6 +621,34 @@ function handleVisibilityChange() {
 function handleMobileViewportChange(event) {
   if (!event.matches) {
     closeSidebar({ restoreFocus: false })
+  }
+}
+
+function addMobileViewportListener(mediaQuery) {
+  if (
+    typeof mediaQuery?.addEventListener === 'function' &&
+    typeof mediaQuery?.removeEventListener === 'function'
+  ) {
+    mediaQuery.addEventListener('change', handleMobileViewportChange)
+  } else if (
+    typeof mediaQuery?.addListener === 'function' &&
+    typeof mediaQuery?.removeListener === 'function'
+  ) {
+    mediaQuery.addListener(handleMobileViewportChange)
+  }
+}
+
+function removeMobileViewportListener(mediaQuery) {
+  if (
+    typeof mediaQuery?.addEventListener === 'function' &&
+    typeof mediaQuery?.removeEventListener === 'function'
+  ) {
+    mediaQuery.removeEventListener('change', handleMobileViewportChange)
+  } else if (
+    typeof mediaQuery?.addListener === 'function' &&
+    typeof mediaQuery?.removeListener === 'function'
+  ) {
+    mediaQuery.removeListener(handleMobileViewportChange)
   }
 }
 

@@ -143,4 +143,32 @@ describe('mobile navigation drawer', () => {
     expect(wrapper.find('[role="dialog"]').exists()).toBe(false)
     expect(wrapper.get('main').attributes()).not.toHaveProperty('inert')
   })
+
+  it('supports legacy MediaQueryList listeners used by older Safari', async () => {
+    let viewportListener
+    const removeListener = vi.fn()
+    vi.spyOn(window, 'matchMedia').mockReturnValue({
+      matches: true,
+      addListener: (listener) => {
+        viewportListener = listener
+      },
+      removeListener,
+    })
+
+    const wrapper = mountView(ModernView)
+    wrappers.push(wrapper)
+    await wrapper.get('.menu-toggle').trigger('click')
+    await flushPromises()
+    expect(wrapper.find('[role="dialog"]').exists()).toBe(true)
+
+    viewportListener({ matches: false })
+    await flushPromises()
+
+    expect(wrapper.find('[role="dialog"]').exists()).toBe(false)
+    expect(wrapper.get('main').attributes()).not.toHaveProperty('inert')
+
+    wrapper.unmount()
+    wrappers = wrappers.filter((candidate) => candidate !== wrapper)
+    expect(removeListener).toHaveBeenCalledWith(viewportListener)
+  })
 })
