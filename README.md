@@ -10,7 +10,7 @@ Browser UI for experimental isolated-gesture recognition in Russian Sign Languag
 
 ## Modes
 
-- **Camera (`/`)** — captures compressed JPEG frames, sends them through one WebSocket, and prefers the backend's authoritative `full_text` transcript snapshots.
+- **Camera (`/`)** — captures compressed JPEG frames, sends them through one WebSocket, shows each accepted gesture immediately, and then replaces the provisional tail when the backend returns an enhanced phrase.
 - **Video file (`/`)** — accepts a video up to 100 MiB, starts an asynchronous backend job, polls its bounded status endpoint, and displays the completed transcript.
 - **Simplified UI (`/simple/`)** — the same live pipeline with larger controls, linear navigation, explicit status copy, and a light high-contrast layout.
 
@@ -46,7 +46,33 @@ Related services: [`backend`](https://github.com/HSE-SignLanguage/backend) · [`
 | Upload video | `POST https://<host>/api/upload` | `/upload` |
 | Poll job | `GET https://<host>/api/job/{id}` | `/job/{id}` |
 
-WebSocket responses use this compatible shape:
+The current WebSocket contract separates immediate recognition from phrase enhancement:
+
+```json
+{
+  "type": "gesture",
+  "text": "я",
+  "full_text": "я",
+  "literal_text": "я",
+  "final_text": "",
+  "draft_text": "я",
+  "confidence": 0.91,
+  "sequence": 1,
+  "segment_id": 1,
+  "status": "draft",
+  "truncated": false
+}
+```
+
+| Event | Purpose |
+| --- | --- |
+| `gesture` | Adds one raw model result to the bounded gesture feed and updates the provisional text immediately. |
+| `formatting` | Marks a segment as being enhanced and carries transcript snapshots without triggering a visible rewrite. |
+| `transcript` | Commits the literal or AI-enhanced segment; this is the only event that triggers the phrase-rewrite motion. |
+
+`full_text` is always the authoritative rendered value and is used for TXT export. `literal_text` independently retains recognizer-only evidence even after AI enhancement. `final_text` and `draft_text` let the UI distinguish committed language from the literal gesture tail. `sequence` deduplicates retried gesture events, while `segment_id` ties formatting state to the phrase being processed. When `truncated` becomes `true`, the bounded session has discarded its oldest finalized prefix and the UI shows a notice.
+
+Older backend messages remain supported:
 
 ```json
 {
@@ -57,7 +83,16 @@ WebSocket responses use this compatible shape:
 }
 ```
 
-New clients prefer `full_text`; `text` remains a delta fallback. See the [backend API documentation](https://github.com/HSE-SignLanguage/backend#api) for upload and job response schemas.
+The client prefers `full_text`; `text` remains a delta fallback. See the [backend API documentation](https://github.com/HSE-SignLanguage/backend#api) for upload and job response schemas.
+
+## Live recognition UX
+
+The camera panel has two honest layers:
+
+- **Gesture feed** — the last ten accepted raw model results appear as chips with confidence when available. They are not presented as grammar-correct text.
+- **Coherent text** — committed text and the raw draft tail remain visually distinct. A compact status shows when AI enhancement is active, and the phrase is revised only after a `transcript` event.
+
+For isolated recognition, show gestures one at a time in the marked camera area. Use a short neutral pause between identical consecutive gestures so the recognizer can separate them. The interface does not claim continuous RSL translation.
 
 ## Local development
 
@@ -120,7 +155,10 @@ The `/api` route must support WebSocket upgrades. The browser connects to `/api/
 - Only one frame encode is active; frames are skipped when WebSocket buffering exceeds 64 KiB.
 - Upload and polling requests are abortable. Polling has request/total timeouts, exponential backoff, terminal client errors, and `Retry-After` handling for `429`.
 - Transcripts are capped client-side to avoid unbounded DOM memory growth.
+- The raw gesture feed is sequence-deduplicated and bounded to ten items; starting a new camera session clears all live transcript state.
+- Recognizer-only `literal_text` and the monotonic `truncated` marker are retained separately from the rendered phrase.
 - Status regions use `aria-live`; the upload surface is keyboard-operable; focus is visible; layouts have no horizontal overflow at 375 px.
+- Gesture entry and phrase replacement use one 240 ms transform/opacity motion system and are disabled by `prefers-reduced-motion`.
 
 ## Known limitations
 

@@ -47,15 +47,18 @@
 
       <div class="controls">
         <button v-if="streamState === 'idle'" class="btn btn-start" @click="startStream">
-          ▶ Начать перевод
+          ▶ Начать распознавание
         </button>
         <button v-else-if="isConnecting" class="btn btn-stop" @click="stopStream">
           Отменить подключение
         </button>
-        <button v-else class="btn btn-stop" @click="stopStream">■ Остановить перевод</button>
+        <button v-else class="btn btn-stop" @click="stopStream">■ Остановить</button>
       </div>
 
       <div class="text-section">
+        <p class="simple-visually-hidden" role="status" aria-live="polite" aria-atomic="true">
+          {{ simpleAnnouncement }}
+        </p>
         <div class="text-heading">
           <label for="outText">Распознанный текст</label>
           <span>Текст появляется автоматически</span>
@@ -64,8 +67,8 @@
           id="outText"
           ref="textareaRef"
           readonly
-          v-model="transcribedText"
-          placeholder="Пока здесь пусто. Нажмите «Начать перевод» и покажите жест в камеру."
+          :value="transcribedText"
+          placeholder="Пока здесь пусто. Нажмите «Начать распознавание» и покажите жест."
         ></textarea>
 
         <button class="btn-download" @click="downloadText" :disabled="!transcribedText">
@@ -79,7 +82,13 @@
 <script setup>
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { getWsUrl } from '../features/api/urls'
-import { createRealtimeSession, mergeTranscription } from '../features/realtime/session'
+import { createRealtimeSession } from '../features/realtime/session'
+import {
+  createLiveTranscriptState,
+  getLiveMessageAnnouncement,
+  reduceLiveTranscript,
+  shouldAnnounceLiveMessage,
+} from '../features/realtime/transcript'
 
 const streamState = ref('idle')
 const isStreaming = computed(() => streamState.value === 'streaming')
@@ -92,20 +101,24 @@ const simpleStatusClass = computed(() => {
   return 'is-ready'
 })
 const simpleStatusTitle = computed(() => {
-  if (isStreaming.value) return 'Перевод идёт'
+  if (isStreaming.value) return 'Распознавание идёт'
   if (isConnecting.value) return 'Подключаемся'
   if (streamError.value.includes('Камера')) return 'Камера недоступна'
   if (streamError.value.includes('сети')) return 'Нет соединения'
-  if (streamError.value) return 'Перевод остановлен'
+  if (streamError.value) return 'Распознавание остановлено'
   return 'Камера готова'
 })
 const simpleStatusDescription = computed(() => {
-  if (isStreaming.value) return 'Показывайте жесты по одному в центре кадра.'
+  if (isStreaming.value) {
+    return 'Показывайте жесты по одному. Между одинаковыми жестами сделайте короткую паузу.'
+  }
   if (isConnecting.value) return 'Проверяем камеру и соединение с сервером.'
   if (streamError.value) return streamError.value
-  return 'Видео не отправляется, пока вы не начнёте перевод.'
+  return 'Видео не отправляется, пока вы не начнёте распознавание.'
 })
-const transcribedText = ref('')
+const liveTranscript = ref(createLiveTranscriptState())
+const transcribedText = computed(() => liveTranscript.value.fullText)
+const simpleAnnouncement = ref('')
 const videoEl = ref(null)
 const canvasEl = ref(null)
 const textareaRef = ref(null)
@@ -119,9 +132,10 @@ const realtimeSession = createRealtimeSession({
 
     if (nextState === 'connecting') {
       streamError.value = ''
+      liveTranscript.value = createLiveTranscriptState()
+      simpleAnnouncement.value = ''
     } else if (nextState === 'streaming') {
       streamError.value = ''
-      transcribedText.value = ''
     } else if (reason === 'disconnected') {
       streamError.value = 'Соединение с сервером закрыто.'
     } else if (reason === 'error') {
@@ -133,10 +147,16 @@ const realtimeSession = createRealtimeSession({
     }
   },
   onMessage(message) {
-    const nextText = mergeTranscription(transcribedText.value, message)
-    if (nextText === transcribedText.value) return
+    const previousState = liveTranscript.value
+    const nextState = reduceLiveTranscript(previousState, message)
+    if (nextState === previousState) return
 
-    transcribedText.value = nextText
+    liveTranscript.value = nextState
+    if (shouldAnnounceLiveMessage(previousState, nextState, message)) {
+      simpleAnnouncement.value = getLiveMessageAnnouncement(message)
+    }
+    if (nextState.fullText === previousState.fullText) return
+
     nextTick(() => {
       if (textareaRef.value) {
         textareaRef.value.scrollTop = textareaRef.value.scrollHeight
@@ -239,6 +259,18 @@ function downloadText() {
   font-kerning: normal;
   display: flex;
   flex-direction: column;
+}
+
+.simple-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .simple-skip-link {

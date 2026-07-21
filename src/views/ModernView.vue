@@ -131,8 +131,8 @@
             :aria-pressed="isStreaming"
           >
             <span v-if="isConnecting">Отменить подключение</span>
-            <span v-else-if="!isStreaming">▶ Начать перевод</span>
-            <span v-else>■ Остановить перевод</span>
+            <span v-else-if="!isStreaming">▶ Начать распознавание</span>
+            <span v-else>■ Остановить</span>
           </button>
         </div>
       </div>
@@ -292,30 +292,129 @@
         <div class="panel-header">
           <div>
             <div class="panel-title">
-              Распознанный текст
+              {{ mode === 'camera' ? 'Эфир распознавания' : 'Распознанный текст' }}
               <span v-if="mode === 'upload' && jobId" class="job-badge">
                 {{ jobId.substring(0, 6) }}…
               </span>
             </div>
-            <p class="panel-caption">Фразы появятся здесь по мере распознавания.</p>
+            <p v-if="mode === 'camera'" class="panel-caption">
+              Показывайте жесты по одному. Между одинаковыми жестами сделайте короткую нейтральную
+              паузу.
+            </p>
+            <p v-else class="panel-caption">Фразы появятся здесь после обработки видео.</p>
           </div>
           <div class="panel-actions">
             <button v-if="isPolling" class="polling-btn" @click="stopPolling">
               <span class="polling-dot"></span>
               Остановить опрос
             </button>
-            <button class="export-btn" @click="downloadText" :disabled="!transcribedText">
+            <button class="export-btn" @click="downloadText" :disabled="!downloadableText">
               Скачать TXT
             </button>
           </div>
         </div>
+
+        <div v-if="mode === 'camera'" class="live-transcript">
+          <p class="visually-hidden" role="status" aria-live="polite" aria-atomic="true">
+            {{ liveAnnouncement }}
+          </p>
+
+          <section class="gesture-stream" aria-labelledby="gesture-stream-title">
+            <div class="live-section-heading">
+              <div>
+                <h2 id="gesture-stream-title">Эфир жестов</h2>
+                <span>Выход модели без редактуры</span>
+              </div>
+              <span v-if="liveTranscript.gestures.length" class="feed-count" aria-hidden="true">
+                {{ liveTranscript.gestures.length }} / {{ MAX_GESTURE_FEED_ITEMS }}
+              </span>
+            </div>
+
+            <TransitionGroup
+              v-if="liveTranscript.gestures.length"
+              name="gesture-feed"
+              tag="ol"
+              class="gesture-list"
+              aria-label="Последние распознанные жесты"
+            >
+              <li
+                v-for="(gesture, index) in liveTranscript.gestures"
+                :key="gesture.sequenceKey || `${gesture.segmentId}-${gesture.text}-${index}`"
+                class="gesture-chip"
+              >
+                <span>{{ gesture.text }}</span>
+                <small v-if="gesture.confidence !== null">
+                  {{ formatConfidence(gesture.confidence) }}
+                </small>
+              </li>
+            </TransitionGroup>
+            <p v-else class="gesture-empty">Здесь сразу появится первый распознанный жест.</p>
+          </section>
+
+          <section class="phrase-output" aria-labelledby="phrase-output-title">
+            <div class="live-section-heading phrase-heading">
+              <div>
+                <h2 id="phrase-output-title">Связный текст</h2>
+                <span>Черновик виден сразу, фраза оформляется позже</span>
+              </div>
+              <span
+                class="phrase-status"
+                :class="{
+                  'is-formatting': liveTranscript.formatting.active,
+                  'is-enhanced':
+                    !liveTranscript.formatting.active && liveTranscript.finalKind === 'enhanced',
+                }"
+              >
+                <span class="phrase-status-dot" aria-hidden="true"></span>
+                {{ phraseStatusText }}
+              </span>
+            </div>
+
+            <div class="phrase-stage" aria-live="off">
+              <Transition name="phrase-rewrite">
+                <p :key="liveTranscript.revision" class="phrase-copy">
+                  <span v-if="liveTranscript.finalText" class="phrase-final">
+                    {{ liveTranscript.finalText }}
+                  </span>
+                  <span v-if="liveTranscript.draftText" class="phrase-draft">
+                    {{ liveTranscript.draftText }}
+                  </span>
+                  <span v-if="!liveTranscript.fullText" class="phrase-empty">
+                    Начните распознавание и покажите короткую последовательность жестов.
+                  </span>
+                </p>
+              </Transition>
+            </div>
+
+            <div v-if="liveTranscript.fullText || liveTranscript.truncated" class="phrase-footer">
+              <div v-if="liveTranscript.fullText" class="phrase-legend" aria-hidden="true">
+                <span
+                  v-if="liveTranscript.finalText"
+                  class="legend-final"
+                  :class="{
+                    'is-enhanced': liveTranscript.finalKind === 'enhanced',
+                    'is-mixed': liveTranscript.finalKind === 'mixed',
+                  }"
+                >
+                  {{ finalKindLabel }}
+                </span>
+                <span v-if="liveTranscript.draftText" class="legend-draft"> Черновик жестов </span>
+              </div>
+              <p v-if="liveTranscript.truncated" class="transcript-truncation">
+                Начало длинной сессии скрыто: показан доступный хвост текста.
+              </p>
+            </div>
+          </section>
+        </div>
+
         <textarea
+          v-else
           ref="textareaRef"
           class="transcription-area"
           readonly
           v-model="transcribedText"
-          aria-label="Распознанный текст"
-          placeholder="Пока здесь пусто. Начните перевод с камеры или загрузите видео."
+          aria-label="Распознанный текст из видео"
+          placeholder="Пока здесь пусто. Загрузите видео и дождитесь обработки."
         ></textarea>
       </section>
     </main>
@@ -323,10 +422,17 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { getApiUrl, getWsUrl } from '../features/api/urls'
 import { getRetryAfterDelay, isTerminalPollingStatus } from '../features/jobs/polling'
 import { createRealtimeSession, mergeTranscription } from '../features/realtime/session'
+import {
+  MAX_GESTURE_FEED_ITEMS,
+  createLiveTranscriptState,
+  getLiveMessageAnnouncement,
+  reduceLiveTranscript,
+  shouldAnnounceLiveMessage,
+} from '../features/realtime/transcript'
 
 const MAX_UPLOAD_SIZE = 100 * 1024 * 1024
 const POLL_BASE_DELAY = 2_000
@@ -345,7 +451,7 @@ const statusDescription = computed(() => {
     return 'Проверяем камеру и соединение с сервером'
   }
   if (streamState.value === 'streaming') {
-    return 'Показывайте жесты по одному в центральной области'
+    return 'Показывайте жесты по одному; между повторами нужна короткая пауза'
   }
 
   const descriptions = {
@@ -357,6 +463,23 @@ const statusDescription = computed(() => {
   return descriptions[statusText.value] || 'Видео не записывается и не отправляется'
 })
 const transcribedText = ref('')
+const liveTranscript = ref(createLiveTranscriptState())
+const liveAnnouncement = ref('')
+const downloadableText = computed(() =>
+  mode.value === 'camera' ? liveTranscript.value.fullText : transcribedText.value,
+)
+const phraseStatusText = computed(() => {
+  if (liveTranscript.value.formatting.active) return 'ИИ оформляет фразу'
+  if (liveTranscript.value.finalKind === 'enhanced') return 'Фраза оформлена'
+  if (liveTranscript.value.finalKind === 'literal') return 'Дословный результат'
+  if (liveTranscript.value.finalKind === 'mixed') return 'Частично оформлено'
+  return 'Ждём жесты'
+})
+const finalKindLabel = computed(() => {
+  if (liveTranscript.value.finalKind === 'enhanced') return 'Оформлено ИИ'
+  if (liveTranscript.value.finalKind === 'literal') return 'Сохранено дословно'
+  return 'Смешанный результат'
+})
 const uploadedFile = ref(null)
 const jobId = ref(null)
 const jobStatus = ref(null)
@@ -392,9 +515,9 @@ const realtimeSession = createRealtimeSession({
 
     if (nextState === 'connecting') {
       statusText.value = 'Подключаемся'
+      resetLiveTranscript()
     } else if (nextState === 'streaming') {
-      statusText.value = 'Перевод идёт'
-      transcribedText.value = ''
+      statusText.value = 'Распознавание идёт'
     } else if (reason === 'disconnected') {
       statusText.value = 'Соединение закрыто'
     } else if (reason === 'error') {
@@ -408,15 +531,12 @@ const realtimeSession = createRealtimeSession({
     }
   },
   onMessage(message) {
-    const nextText = mergeTranscription(transcribedText.value, message)
-    if (nextText === transcribedText.value) return
+    const previousState = liveTranscript.value
+    const nextState = reduceLiveTranscript(previousState, message)
+    if (nextState === previousState) return
 
-    transcribedText.value = nextText
-    nextTick(() => {
-      if (textareaRef.value) {
-        textareaRef.value.scrollTop = textareaRef.value.scrollHeight
-      }
-    })
+    liveTranscript.value = nextState
+    updateLiveAnnouncement(previousState, nextState, message)
   },
   onError(error) {
     console.error('Realtime error:', error)
@@ -488,6 +608,20 @@ function toggleStream() {
   } else {
     void realtimeSession.start()
   }
+}
+
+function resetLiveTranscript() {
+  liveTranscript.value = createLiveTranscriptState()
+  liveAnnouncement.value = ''
+}
+
+function updateLiveAnnouncement(previousState, nextState, message) {
+  if (!shouldAnnounceLiveMessage(previousState, nextState, message)) return
+  liveAnnouncement.value = getLiveMessageAnnouncement(message)
+}
+
+function formatConfidence(confidence) {
+  return `${Math.round(confidence * 100)}%`
 }
 
 // --- Upload Logic ---
@@ -770,6 +904,7 @@ function resetUpload() {
   uploadProgress.value = 0
   isDragOver.value = false
   processingProgress.value = 0
+  transcribedText.value = ''
 
   if (fileInput.value) {
     fileInput.value.value = ''
@@ -798,9 +933,10 @@ function selectMobileMode(newMode) {
 
 // --- Export ---
 function downloadText() {
-  if (!transcribedText.value) return
+  const text = downloadableText.value
+  if (!text) return
 
-  const blob = new Blob([transcribedText.value], { type: 'text/plain' })
+  const blob = new Blob([text], { type: 'text/plain' })
   const url = URL.createObjectURL(blob)
   const anchor = document.createElement('a')
   anchor.href = url
@@ -1661,6 +1797,286 @@ function downloadText() {
   animation: pulse 1.4s ease-in-out infinite;
 }
 
+.live-transcript {
+  display: grid;
+  grid-template-rows: minmax(132px, 0.72fr) minmax(210px, 1.28fr);
+  flex: 1;
+  min-height: 0;
+  gap: var(--space-md);
+  overflow: hidden;
+}
+
+.gesture-stream,
+.phrase-output {
+  min-width: 0;
+  min-height: 0;
+  padding: var(--space-lg);
+  border: 1px solid rgba(194, 170, 255, 0.16);
+  background: #0e0c18;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.gesture-stream {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  border-radius: 14px 14px 10px 14px;
+  background: radial-gradient(circle at 100% 0, rgba(0, 242, 255, 0.07), transparent 30%), #0e0c18;
+}
+
+.phrase-output {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: var(--space-md);
+  border-color: rgba(177, 140, 255, 0.24);
+  border-radius: 10px 14px 18px 14px;
+  background: radial-gradient(circle at 100% 0, rgba(141, 92, 255, 0.13), transparent 34%), #0e0c18;
+}
+
+.live-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.live-section-heading > div:first-child {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.live-section-heading h2 {
+  margin: 0;
+  color: var(--ink);
+  font-family: 'Onest', 'Segoe UI', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.live-section-heading > div > span {
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.feed-count {
+  flex: 0 0 auto;
+  color: #8feef3;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+}
+
+.gesture-list {
+  display: flex;
+  align-content: flex-start;
+  flex-wrap: wrap;
+  min-height: 0;
+  margin: 0;
+  padding: 0 2px 2px 0;
+  gap: var(--space-sm);
+  list-style: none;
+  overflow: auto;
+  scrollbar-color: rgba(177, 140, 255, 0.4) transparent;
+}
+
+.gesture-chip {
+  display: inline-flex;
+  align-items: baseline;
+  max-width: 100%;
+  padding: 6px 9px;
+  gap: 6px;
+  border: 1px solid rgba(0, 242, 255, 0.24);
+  border-radius: 8px 10px 10px 8px;
+  background: rgba(0, 242, 255, 0.07);
+  color: #dbfcff;
+  font-size: 0.875rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.gesture-chip small {
+  flex: 0 0 auto;
+  color: #8feef3;
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.gesture-empty,
+.phrase-empty {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.gesture-empty {
+  margin-block: auto;
+}
+
+.phrase-heading {
+  display: grid;
+}
+
+.phrase-status {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  min-height: 24px;
+  padding: 3px 8px;
+  gap: 6px;
+  border: 1px solid rgba(194, 170, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(141, 92, 255, 0.08);
+  color: var(--ink-muted);
+  font-size: 0.6875rem;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.phrase-status-dot {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #777184;
+}
+
+.phrase-status.is-formatting {
+  border-color: rgba(177, 140, 255, 0.42);
+  background: rgba(141, 92, 255, 0.16);
+  color: #dbcaff;
+}
+
+.phrase-status.is-formatting .phrase-status-dot {
+  background: var(--violet-bright);
+  box-shadow: 0 0 10px rgba(177, 140, 255, 0.46);
+}
+
+.phrase-status.is-enhanced {
+  border-color: rgba(0, 255, 136, 0.28);
+  background: rgba(0, 255, 136, 0.07);
+  color: #a3f6cb;
+}
+
+.phrase-status.is-enhanced .phrase-status-dot {
+  background: var(--green);
+}
+
+.phrase-stage {
+  display: grid;
+  min-height: 0;
+  padding: var(--space-sm) 2px;
+  overflow: auto;
+  scrollbar-color: rgba(177, 140, 255, 0.4) transparent;
+}
+
+.phrase-copy {
+  grid-area: 1 / 1;
+  align-self: start;
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.phrase-final {
+  color: var(--ink);
+}
+
+.phrase-draft {
+  border-radius: 5px;
+  background: rgba(141, 92, 255, 0.13);
+  color: #d8c8ff;
+  box-shadow: 0 0 0 3px rgba(141, 92, 255, 0.13);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.phrase-final + .phrase-draft::before {
+  content: ' ';
+}
+
+.phrase-footer {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.phrase-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  color: var(--ink-muted);
+  font-size: 0.6875rem;
+  line-height: 1.35;
+}
+
+.phrase-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.phrase-legend span::before {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 auto;
+  content: '';
+  border-radius: 50%;
+}
+
+.legend-final::before {
+  background: #777184;
+}
+
+.legend-final.is-enhanced::before {
+  background: var(--green);
+}
+
+.legend-final.is-mixed::before {
+  background: var(--violet-bright);
+}
+
+.legend-draft::before {
+  background: var(--violet-bright);
+}
+
+.transcript-truncation {
+  margin: 0;
+  padding-top: var(--space-sm);
+  border-top: 1px solid rgba(194, 170, 255, 0.14);
+  color: var(--ink-muted);
+  font-size: 0.6875rem;
+  line-height: 1.45;
+}
+
+.gesture-feed-enter-active,
+.phrase-rewrite-enter-active,
+.phrase-rewrite-leave-active {
+  transition:
+    opacity 240ms var(--ease-out-quint),
+    transform 240ms var(--ease-out-quint);
+}
+
+.gesture-feed-enter-from {
+  opacity: 0;
+  transform: translateY(6px) scale(0.98);
+}
+
+.phrase-rewrite-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.phrase-rewrite-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
 .transcription-area {
   flex: 1;
   width: 100%;
@@ -1978,6 +2394,19 @@ function downloadText() {
     border-radius: 14px 14px 17px 17px;
   }
 
+  .live-transcript {
+    grid-template-rows: auto auto;
+    overflow: visible;
+  }
+
+  .gesture-stream {
+    min-height: 148px;
+  }
+
+  .phrase-output {
+    min-height: 220px;
+  }
+
   .panel-header {
     flex-direction: row;
   }
@@ -2004,6 +2433,15 @@ function downloadText() {
   .panel-actions .export-btn,
   .panel-actions .polling-btn {
     width: 100%;
+  }
+
+  .gesture-stream,
+  .phrase-output {
+    padding: var(--space-md);
+  }
+
+  .phrase-copy {
+    font-size: 1rem;
   }
 
   .file-info {
