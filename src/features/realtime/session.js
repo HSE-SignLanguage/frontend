@@ -1,3 +1,5 @@
+import { diagnostics } from '../diagnostics/logger'
+
 const DEFAULT_FPS = 24
 const MAX_BUFFERED_BYTES = 64 * 1024
 const DEFAULT_CAMERA_TIMEOUT_MS = 20_000
@@ -317,8 +319,8 @@ export function createRealtimeSession({
 
         try {
           onMessage(JSON.parse(event.data))
-        } catch (error) {
-          console.warn('WS message parse error:', error)
+        } catch {
+          diagnostics.warn('malformed-websocket-message')
         }
       }
 

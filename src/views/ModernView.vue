@@ -1,15 +1,15 @@
 <template>
   <div class="app-container">
-    <a class="skip-link" href="#main-content">Перейти к переводчику</a>
+    <a class="skip-link" href="#main-content" :inert="sidebarOpen">Перейти к переводчику</a>
 
-    <header class="desktop-header">
+    <header class="desktop-header" :inert="sidebarOpen">
       <router-link to="/" class="logo" aria-label="Sigma Sign, главная">
         <svg
           width="24"
           height="24"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="white"
+          stroke="currentColor"
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
@@ -40,14 +40,14 @@
       </nav>
     </header>
 
-    <header class="mobile-header">
+    <header class="mobile-header" :inert="sidebarOpen">
       <router-link to="/" class="logo compact-logo" aria-label="Sigma Sign, главная">
         <svg
           width="22"
           height="22"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="white"
+          stroke="currentColor"
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
@@ -58,17 +58,20 @@
         <span class="logo-wordmark">Sigma <strong>Sign</strong></span>
       </router-link>
       <button
+        ref="menuButtonRef"
+        type="button"
         class="menu-toggle"
         @click="toggleSidebar"
-        aria-label="Открыть меню"
+        :aria-label="sidebarOpen ? 'Закрыть меню' : 'Открыть меню'"
         :aria-expanded="sidebarOpen"
+        aria-controls="mobile-navigation-dialog"
       >
         <svg
           width="24"
           height="24"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="white"
+          stroke="currentColor"
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
@@ -80,28 +83,50 @@
       </button>
     </header>
 
-    <div class="mobile-sidebar" :class="{ open: sidebarOpen }" :aria-hidden="!sidebarOpen">
-      <div class="sidebar-overlay" @click="toggleSidebar"></div>
-      <aside class="sidebar-content" aria-label="Мобильное меню">
-        <div class="sidebar-heading">
-          <span>Режим перевода</span>
-          <button class="sidebar-close" @click="toggleSidebar" aria-label="Закрыть меню">×</button>
-        </div>
-        <nav class="sidebar-nav">
-          <button @click="selectMobileMode('camera')" :class="{ active: mode === 'camera' }">
-            Камера
-          </button>
-          <button @click="selectMobileMode('upload')" :class="{ active: mode === 'upload' }">
-            Видеофайл
-          </button>
-          <router-link to="/simple/" class="nav-link" @click="toggleSidebar"
-            >Упрощённый режим</router-link
-          >
-        </nav>
-      </aside>
-    </div>
+    <Transition name="mobile-drawer">
+      <div
+        v-if="sidebarOpen"
+        id="mobile-navigation-dialog"
+        class="mobile-sidebar open"
+        @keydown="handleSidebarKeydown"
+      >
+        <div class="sidebar-overlay" aria-hidden="true" @click="closeSidebar()"></div>
+        <aside
+          ref="sidebarDialogRef"
+          class="sidebar-content"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="mobile-navigation-title"
+          tabindex="-1"
+        >
+          <div class="sidebar-heading">
+            <span id="mobile-navigation-title">Режим перевода</span>
+            <button
+              type="button"
+              class="sidebar-close"
+              data-drawer-autofocus
+              @click="closeSidebar()"
+              aria-label="Закрыть меню"
+            >
+              ×
+            </button>
+          </div>
+          <nav class="sidebar-nav" aria-label="Режим перевода">
+            <button @click="selectMobileMode('camera')" :class="{ active: mode === 'camera' }">
+              Камера
+            </button>
+            <button @click="selectMobileMode('upload')" :class="{ active: mode === 'upload' }">
+              Видеофайл
+            </button>
+            <router-link to="/simple/" class="nav-link" @click="closeSidebar()">
+              Упрощённый режим
+            </router-link>
+          </nav>
+        </aside>
+      </div>
+    </Transition>
 
-    <main id="main-content" class="content-wrapper">
+    <main id="main-content" class="content-wrapper" :inert="sidebarOpen">
       <h1 class="visually-hidden">Sigma Sign — перевод русской жестовой речи</h1>
 
       <!-- РЕЖИМ КАМЕРЫ -->
@@ -166,7 +191,8 @@
             height="50"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#a0a0a0"
+            class="upload-icon"
+            stroke="currentColor"
             stroke-width="1"
           >
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -185,7 +211,8 @@
               height="40"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#00ff88"
+              class="file-icon"
+              stroke="currentColor"
               stroke-width="1.5"
             >
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -251,7 +278,14 @@
             </div>
 
             <div v-if="jobError" class="error-message" role="alert">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff4444">
+              <svg
+                class="error-icon"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
                 <circle cx="12" cy="12" r="10"></circle>
                 <line x1="12" y1="8" x2="12" y2="12"></line>
                 <line x1="12" y1="16" x2="12.01" y2="16"></line>
@@ -265,7 +299,8 @@
                 height="40"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#00ff88"
+                class="completion-icon"
+                stroke="currentColor"
                 stroke-width="2"
               >
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
@@ -422,8 +457,9 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { getApiUrl, getWsUrl } from '../features/api/urls'
+import { diagnostics } from '../features/diagnostics/logger'
 import { getRetryAfterDelay, isTerminalPollingStatus } from '../features/jobs/polling'
 import { createRealtimeSession, mergeTranscription } from '../features/realtime/session'
 import {
@@ -497,6 +533,8 @@ const videoEl = ref(null)
 const canvasEl = ref(null)
 const fileInput = ref(null)
 const textareaRef = ref(null)
+const menuButtonRef = ref(null)
+const sidebarDialogRef = ref(null)
 
 let uploadGeneration = 0
 let uploadController = null
@@ -505,6 +543,7 @@ let pollTimer = null
 let pollController = null
 let pollStartedAt = 0
 let pollDelay = POLL_BASE_DELAY
+let mobileViewportQuery = null
 
 const realtimeSession = createRealtimeSession({
   getVideoElement: () => videoEl.value,
@@ -538,8 +577,8 @@ const realtimeSession = createRealtimeSession({
     liveTranscript.value = nextState
     updateLiveAnnouncement(previousState, nextState, message)
   },
-  onError(error) {
-    console.error('Realtime error:', error)
+  onError() {
+    diagnostics.warn('realtime-failed')
   },
 })
 
@@ -548,13 +587,16 @@ onMounted(() => {
   window.addEventListener('pagehide', handlePageHide)
   window.addEventListener('offline', handleConnectionLoss)
   document.addEventListener('visibilitychange', handleVisibilityChange)
-  void initCamera()
+  mobileViewportQuery = window.matchMedia?.('(max-width: 900px)') || null
+  mobileViewportQuery?.addEventListener('change', handleMobileViewportChange)
 })
 
 onUnmounted(() => {
   window.removeEventListener('pagehide', handlePageHide)
   window.removeEventListener('offline', handleConnectionLoss)
   document.removeEventListener('visibilitychange', handleVisibilityChange)
+  mobileViewportQuery?.removeEventListener('change', handleMobileViewportChange)
+  mobileViewportQuery = null
   realtimeSession.destroy()
   abortUpload()
   stopPolling()
@@ -576,17 +618,9 @@ function handleVisibilityChange() {
   }
 }
 
-// --- Camera Logic ---
-async function initCamera() {
-  if (mode.value !== 'camera') return
-
-  try {
-    await realtimeSession.prepareCamera()
-  } catch (error) {
-    console.error('Camera Init Error:', error)
-    if (mode.value === 'camera') {
-      statusText.value = 'Камера недоступна'
-    }
+function handleMobileViewportChange(event) {
+  if (!event.matches) {
+    closeSidebar({ restoreFocus: false })
   }
 }
 
@@ -596,7 +630,6 @@ function setMode(newMode) {
   mode.value = newMode
   if (newMode === 'camera') {
     resetUpload()
-    void initCamera()
   } else {
     realtimeSession.stop('mode-change')
   }
@@ -735,7 +768,7 @@ async function uploadVideo() {
   } catch (error) {
     if (requestGeneration !== uploadGeneration || error.name === 'AbortError') return
 
-    console.error('Upload error:', error)
+    diagnostics.warn('upload-failed')
     jobError.value = error.message
     alert(`Ошибка загрузки: ${error.message}`)
   } finally {
@@ -836,11 +869,11 @@ async function pollJobStatus(requestGeneration, polledJobId) {
     } else if (data.status === 'failed') {
       stopPolling()
     }
-  } catch (error) {
+  } catch {
     if (!isCurrentPoll(requestGeneration, polledJobId)) return
     if (controller.signal.aborted && !requestTimedOut) return
 
-    console.error('Polling error:', error)
+    diagnostics.warn('polling-failed')
     jobError.value = requestTimedOut
       ? 'Сервер не ответил вовремя. Повторяем запрос...'
       : 'Ошибка получения статуса. Повторяем запрос...'
@@ -922,13 +955,70 @@ function getStatusText(status) {
 }
 
 // --- Sidebar ---
+const SIDEBAR_FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',')
+
 function toggleSidebar() {
-  sidebarOpen.value = !sidebarOpen.value
+  if (sidebarOpen.value) {
+    closeSidebar()
+  } else {
+    openSidebar()
+  }
+}
+
+function openSidebar() {
+  if (sidebarOpen.value) return
+
+  sidebarOpen.value = true
+  void nextTick(() => {
+    const dialog = sidebarDialogRef.value
+    const initialTarget = dialog?.querySelector('[data-drawer-autofocus]') || dialog
+    initialTarget?.focus()
+  })
+}
+
+function closeSidebar({ restoreFocus = true } = {}) {
+  if (!sidebarOpen.value) return
+
+  sidebarOpen.value = false
+  if (restoreFocus) {
+    void nextTick(() => menuButtonRef.value?.focus())
+  }
+}
+
+function handleSidebarKeydown(event) {
+  if (event.key === 'Escape') {
+    event.preventDefault()
+    closeSidebar()
+    return
+  }
+  if (event.key !== 'Tab') return
+
+  const dialog = sidebarDialogRef.value
+  const focusableElements = Array.from(dialog?.querySelectorAll(SIDEBAR_FOCUSABLE_SELECTOR) || [])
+  if (!focusableElements.length) {
+    event.preventDefault()
+    dialog?.focus()
+    return
+  }
+
+  const firstElement = focusableElements[0]
+  const lastElement = focusableElements.at(-1)
+  if (event.shiftKey && document.activeElement === firstElement) {
+    event.preventDefault()
+    lastElement.focus()
+  } else if (!event.shiftKey && document.activeElement === lastElement) {
+    event.preventDefault()
+    firstElement.focus()
+  }
 }
 
 function selectMobileMode(newMode) {
   setMode(newMode)
-  sidebarOpen.value = false
+  closeSidebar()
 }
 
 // --- Export ---
@@ -964,16 +1054,24 @@ function downloadText() {
   --space-3xl: 48px;
   --ink: #f8f6ff;
   --ink-muted: #b8b1c9;
+  --ink-subtle: #777184;
   --violet: #8d5cff;
   --violet-bright: #b18cff;
+  --violet-solid: #6840c7;
   --cyan: #00f2ff;
+  --cyan-soft: #8feef3;
   --green: #00ff88;
+  --warning: #ffaa00;
+  --danger: #ff4444;
+  --surface-base: #0e0c16;
+  --surface-panel: #0e0c18;
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
   font-family: 'Golos Text', 'Segoe UI', sans-serif;
   font-kerning: normal;
   background:
     radial-gradient(circle at 10% -16%, rgba(141, 92, 255, 0.28), transparent 34%),
-    radial-gradient(circle at 96% 116%, rgba(0, 242, 255, 0.12), transparent 30%), #0e0c16;
+    radial-gradient(circle at 96% 116%, rgba(0, 242, 255, 0.12), transparent 30%),
+    var(--surface-base);
   color: var(--ink);
   min-height: 100dvh;
   height: 100dvh;
@@ -1009,8 +1107,8 @@ function downloadText() {
   left: var(--space-sm);
   z-index: 1200;
   transform: translateY(-160%);
-  background: #00f2ff;
-  color: #000;
+  background: var(--cyan);
+  color: var(--surface-base);
   padding: var(--space-md) var(--space-lg);
   border-radius: 8px;
   font-weight: 700;
@@ -1060,7 +1158,7 @@ function downloadText() {
   align-items: center;
   gap: var(--space-md);
   min-height: 44px;
-  color: #fff;
+  color: var(--ink);
   text-decoration: none;
 }
 
@@ -1072,12 +1170,12 @@ function downloadText() {
 }
 
 .logo .logo-wordmark {
-  color: #fff;
+  color: var(--ink);
   text-shadow: none;
 }
 
 .logo-wordmark strong {
-  color: #00f2ff;
+  color: var(--cyan);
   font-weight: 700;
 }
 
@@ -1123,7 +1221,7 @@ function downloadText() {
 .desktop-header .mode-switch button.active {
   color: var(--ink);
   border-color: rgba(194, 170, 255, 0.34);
-  background: #6840c7;
+  background: var(--violet-solid);
   box-shadow:
     inset 0 1px rgba(255, 255, 255, 0.18),
     0 8px 22px rgba(77, 42, 153, 0.28);
@@ -1290,12 +1388,12 @@ function downloadText() {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #777184;
+  background: var(--ink-subtle);
   box-shadow: 0 0 0 4px rgba(119, 113, 132, 0.16);
 }
 
 .recording-dot.active {
-  background: #ff4444;
+  background: var(--danger);
   box-shadow:
     0 0 0 5px rgba(255, 68, 68, 0.18),
     0 0 18px rgba(255, 68, 68, 0.36);
@@ -1399,7 +1497,7 @@ function downloadText() {
 }
 
 .stream-btn.is-recording {
-  border-color: #ff4444;
+  border-color: var(--danger);
   background: rgba(64, 16, 30, 0.9);
   color: #ff9aaa;
   box-shadow:
@@ -1408,8 +1506,8 @@ function downloadText() {
 }
 
 .stream-btn.is-recording:hover {
-  background: #ff4444;
-  color: #fff;
+  background: var(--danger);
+  color: var(--ink);
   box-shadow: 0 16px 34px rgba(255, 68, 68, 0.24);
 }
 
@@ -1503,6 +1601,15 @@ function downloadText() {
   border-radius: 18px;
   background: rgba(15, 12, 26, 0.72);
   box-shadow: inset 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.file-icon,
+.completion-icon {
+  color: var(--green);
+}
+
+.error-icon {
+  color: var(--danger);
 }
 
 .file-details {
@@ -1651,29 +1758,29 @@ function downloadText() {
 }
 
 .status-indicator.queued {
-  border-color: #ffaa00;
+  border-color: var(--warning);
 }
 .status-indicator.processing {
   border-color: var(--violet-bright);
 }
 .status-indicator.completed {
-  border-color: #00ff88;
+  border-color: var(--green);
 }
 .status-indicator.failed {
-  border-color: #ff4444;
+  border-color: var(--danger);
 }
 .status-indicator.queued .status-dot {
-  background: #ffaa00;
+  background: var(--warning);
 }
 .status-indicator.processing .status-dot {
   background: var(--violet-bright);
   animation: pulse 1.4s ease-in-out infinite;
 }
 .status-indicator.completed .status-dot {
-  background: #00ff88;
+  background: var(--green);
 }
 .status-indicator.failed .status-dot {
-  background: #ff4444;
+  background: var(--danger);
 }
 
 .error-message {
@@ -1695,7 +1802,7 @@ function downloadText() {
   padding: var(--space-xl);
   border: 1px solid rgba(0, 255, 136, 0.2);
   background: rgba(0, 255, 136, 0.05);
-  color: #00ff88;
+  color: var(--green);
   text-align: center;
 }
 
@@ -1812,7 +1919,7 @@ function downloadText() {
   min-height: 0;
   padding: var(--space-lg);
   border: 1px solid rgba(194, 170, 255, 0.16);
-  background: #0e0c18;
+  background: var(--surface-panel);
   box-shadow: inset 0 1px rgba(255, 255, 255, 0.04);
 }
 
@@ -1821,7 +1928,9 @@ function downloadText() {
   flex-direction: column;
   gap: var(--space-md);
   border-radius: 14px 14px 10px 14px;
-  background: radial-gradient(circle at 100% 0, rgba(0, 242, 255, 0.07), transparent 30%), #0e0c18;
+  background:
+    radial-gradient(circle at 100% 0, rgba(0, 242, 255, 0.07), transparent 30%),
+    var(--surface-panel);
 }
 
 .phrase-output {
@@ -1830,7 +1939,9 @@ function downloadText() {
   gap: var(--space-md);
   border-color: rgba(177, 140, 255, 0.24);
   border-radius: 10px 14px 18px 14px;
-  background: radial-gradient(circle at 100% 0, rgba(141, 92, 255, 0.13), transparent 34%), #0e0c18;
+  background:
+    radial-gradient(circle at 100% 0, rgba(141, 92, 255, 0.13), transparent 34%),
+    var(--surface-panel);
 }
 
 .live-section-heading {
@@ -1864,7 +1975,7 @@ function downloadText() {
 
 .feed-count {
   flex: 0 0 auto;
-  color: #8feef3;
+  color: var(--cyan-soft);
   font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
   line-height: 1.4;
@@ -1900,7 +2011,7 @@ function downloadText() {
 
 .gesture-chip small {
   flex: 0 0 auto;
-  color: #8feef3;
+  color: var(--cyan-soft);
   font-size: 0.6875rem;
   font-variant-numeric: tabular-nums;
 }
@@ -1942,7 +2053,7 @@ function downloadText() {
   height: 6px;
   flex: 0 0 auto;
   border-radius: 50%;
-  background: #777184;
+  background: var(--ink-subtle);
 }
 
 .phrase-status.is-formatting {
@@ -2030,7 +2141,7 @@ function downloadText() {
 }
 
 .legend-final::before {
-  background: #777184;
+  background: var(--ink-subtle);
 }
 
 .legend-final.is-enhanced::before {
@@ -2084,7 +2195,9 @@ function downloadText() {
   padding: var(--space-lg);
   border: 1px solid rgba(194, 170, 255, 0.18);
   border-radius: 14px 14px 18px 14px;
-  background: radial-gradient(circle at 100% 0, rgba(141, 92, 255, 0.09), transparent 28%), #0e0c18;
+  background:
+    radial-gradient(circle at 100% 0, rgba(141, 92, 255, 0.09), transparent 28%),
+    var(--surface-panel);
   color: var(--ink);
   font-family: 'Golos Text', 'Segoe UI', sans-serif;
   font-size: 1rem;
@@ -2242,6 +2355,21 @@ function downloadText() {
     visibility: visible;
   }
 
+  .mobile-drawer-enter-active,
+  .mobile-drawer-leave-active {
+    transition: opacity 180ms ease-out;
+  }
+
+  .mobile-sidebar.open.mobile-drawer-enter-from,
+  .mobile-sidebar.open.mobile-drawer-leave-to {
+    opacity: 0;
+  }
+
+  .mobile-sidebar.open.mobile-drawer-enter-from .sidebar-content,
+  .mobile-sidebar.open.mobile-drawer-leave-to .sidebar-content {
+    transform: translateX(-100%);
+  }
+
   .sidebar-overlay {
     position: absolute;
     inset: 0;
@@ -2314,7 +2442,7 @@ function downloadText() {
 
   .sidebar-nav button.active {
     border-color: rgba(194, 170, 255, 0.3);
-    background: #6840c7;
+    background: var(--violet-solid);
     color: var(--ink);
     box-shadow:
       inset 0 1px rgba(255, 255, 255, 0.14),

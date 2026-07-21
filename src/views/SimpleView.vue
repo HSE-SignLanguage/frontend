@@ -82,6 +82,7 @@
 <script setup>
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { getWsUrl } from '../features/api/urls'
+import { diagnostics } from '../features/diagnostics/logger'
 import { createRealtimeSession } from '../features/realtime/session'
 import {
   createLiveTranscriptState,
@@ -163,8 +164,8 @@ const realtimeSession = createRealtimeSession({
       }
     })
   },
-  onError(error) {
-    console.error('Realtime error:', error)
+  onError() {
+    diagnostics.warn('realtime-failed')
   },
 })
 
@@ -172,7 +173,6 @@ onMounted(() => {
   window.addEventListener('pagehide', handlePageHide)
   window.addEventListener('offline', handleConnectionLoss)
   document.addEventListener('visibilitychange', handleVisibilityChange)
-  void initCamera()
 })
 
 onUnmounted(() => {
@@ -193,15 +193,6 @@ function handleConnectionLoss() {
 function handleVisibilityChange() {
   if (document.hidden) {
     realtimeSession.stop('hidden')
-  }
-}
-
-async function initCamera() {
-  try {
-    await realtimeSession.prepareCamera()
-  } catch (error) {
-    console.error('Camera Init Error:', error)
-    streamError.value = 'Камера не найдена или доступ запрещён.'
   }
 }
 
@@ -247,6 +238,8 @@ function downloadText() {
   --violet-pale: #eee7ff;
   --simple-ink: #272138;
   --simple-muted: #595266;
+  --simple-on-accent: #fbf9ff;
+  --simple-danger: #c82333;
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
   min-height: 100dvh;
   background:
@@ -282,7 +275,7 @@ function downloadText() {
   padding: var(--space-md) var(--space-lg);
   border-radius: 10px;
   background: var(--violet);
-  color: #fbf9ff;
+  color: var(--simple-on-accent);
   font-weight: 700;
   text-decoration: none;
   transition: transform 160ms ease-out;
@@ -443,11 +436,11 @@ function downloadText() {
 }
 
 .status-bar.is-error {
-  border-color: #c82333;
+  border-color: var(--simple-danger);
 }
 
 .status-bar.is-error .simple-status-dot {
-  background: #c82333;
+  background: var(--simple-danger);
 }
 
 @keyframes simple-pulse {
@@ -530,7 +523,7 @@ function downloadText() {
   padding: var(--space-lg) var(--space-xl);
   border: 0;
   border-radius: 15px;
-  color: #fbf9ff;
+  color: var(--simple-on-accent);
   font-family: 'Onest', 'Verdana', sans-serif;
   font-size: 1.25rem;
   font-weight: 700;
@@ -562,7 +555,7 @@ function downloadText() {
 }
 
 .btn-stop {
-  background: #c82333;
+  background: var(--simple-danger);
   box-shadow:
     inset 0 1px rgba(255, 255, 255, 0.18),
     0 14px 32px rgba(200, 35, 51, 0.2);
@@ -637,7 +630,7 @@ function downloadText() {
   border-radius: 13px;
   border: 0;
   background: var(--violet);
-  color: #fbf9ff;
+  color: var(--simple-on-accent);
   font-family: 'Golos Text', 'Verdana', sans-serif;
   font-size: 1.125rem;
   font-weight: 600;
